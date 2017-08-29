@@ -50,6 +50,8 @@ If you have questions concerning this license or the applicable additional terms
 #pragma comment (lib, "wbemuuid.lib")
 
 #pragma warning(disable:4740)	// warning C4740: flow in or out of inline asm code suppresses global optimization
+#pragma warning(disable:4091)	// Seems to be an issue with platform SDK.  Microsoft still working on fix.
+								// warning C4091: 'typedef ': ignored on left of '' when no variable is declared
 
 /*
 ================
