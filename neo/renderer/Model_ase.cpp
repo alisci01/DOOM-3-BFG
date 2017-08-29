@@ -845,19 +845,19 @@ ASE_Load
 aseModel_t *ASE_Load( const char *fileName ) {
 	char *buf;
 	ID_TIME_T timeStamp;
-	aseModel_t *ase;
+	aseModel_t *aseModel;
 
 	fileSystem->ReadFile( fileName, (void **)&buf, &timeStamp );
 	if ( !buf ) {
 		return NULL;
 	}
 
-	ase = ASE_Parse( buf, false );
-	ase->timeStamp = timeStamp;
+	aseModel = ASE_Parse( buf, false );
+	aseModel->timeStamp = timeStamp;
 
 	fileSystem->FreeFile( buf );
 
-	return ase;
+	return aseModel;
 }
 
 /*
@@ -865,17 +865,17 @@ aseModel_t *ASE_Load( const char *fileName ) {
 ASE_Free
 =================
 */
-void ASE_Free( aseModel_t *ase ) {
+void ASE_Free( aseModel_t *aseModel ) {
 	int					i, j;
 	aseObject_t			*obj;
 	aseMesh_t			*mesh;
 	aseMaterial_t		*material;
 
-	if ( !ase ) {
+	if ( !aseModel ) {
 		return;
 	}
-	for ( i = 0; i < ase->objects.Num(); i++ ) {
-		obj = ase->objects[i];
+	for ( i = 0; i < aseModel->objects.Num(); i++ ) {
+		obj = aseModel->objects[i];
 		for ( j = 0; j < obj->frames.Num(); j++ ) {
 			mesh = obj->frames[j];
 			if ( mesh->vertexes ) {
@@ -911,13 +911,13 @@ void ASE_Free( aseModel_t *ase ) {
 		}
 		Mem_Free( obj );
 	}
-	ase->objects.Clear();
+	aseModel->objects.Clear();
 
-	for ( i = 0; i < ase->materials.Num(); i++ ) {
-		material = ase->materials[i];
+	for ( i = 0; i < aseModel->materials.Num(); i++ ) {
+		material = aseModel->materials[i];
 		Mem_Free( material );
 	}
-	ase->materials.Clear();
+	aseModel->materials.Clear();
 
-	delete ase;
+	delete aseModel;
 }

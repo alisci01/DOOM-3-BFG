@@ -933,10 +933,10 @@ void idAnim::CallFrameCommands( idEntity *ent, int from, int to ) const {
 					break;
 				}
 				case FC_START_EMITTER: {
-					int index = command.string->Find(" ");
-					if(index >= 0) {
-						idStr name = command.string->Left(index);
-						idStr particle = command.string->Right(command.string->Length() - index - 1);
+					int spcIndex = command.string->Find(" ");
+					if(spcIndex >= 0) {
+						idStr name = command.string->Left(spcIndex);
+						idStr particle = command.string->Right(command.string->Length() - spcIndex - 1);
 						ent->ProcessEvent( &AI_StartEmitter, name.c_str(), modelDef->GetJointName( command.index ), particle.c_str() );
 					}
 				}
@@ -4270,8 +4270,6 @@ bool idAnimator::CreateFrame( int currentTime, bool force ) {
 	const int *			jointParent;
 	const jointMod_t *	jointMod;
 	const idJointQuat *	defaultPose;
-
-	static idCVar		r_showSkel( "r_showSkel", "0", CVAR_RENDERER | CVAR_INTEGER, "", 0, 2, idCmdSystem::ArgCompletion_Integer<0,2> );
 
 	if ( !modelDef || !modelDef->ModelHandle() ) {
 		return false;

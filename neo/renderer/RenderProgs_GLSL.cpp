@@ -411,9 +411,9 @@ idStr StripDeadCode( const idStr & in, const char * name ) {
 		int i = stack[stack.Num() - 1];
 		stack.SetNum( stack.Num() - 1 );
 
-		idLexer src( LEXFL_NOFATALERRORS );
-		src.LoadMemory( blocks[i].postfix.c_str(), blocks[i].postfix.Length(), name );
-		while ( src.ReadToken( &token ) ) {
+		idLexer srcBlock( LEXFL_NOFATALERRORS );
+		srcBlock.LoadMemory( blocks[i].postfix.c_str(), blocks[i].postfix.Length(), name );
+		while ( srcBlock.ReadToken( &token ) ) {
 			for ( int j = 0; j < blocks.Num(); j++ ) {
 				if ( !blocks[j].used ) {
 					if ( token == blocks[j].name ) {
@@ -1038,8 +1038,8 @@ GLuint idRenderProgManager::LoadGLSLShader( GLenum target, const char * name, id
 				const char separator = '\n';
 				idList<idStr> lines;
 				lines.Clear();
-				idStr source( programGLSL );
-				lines.Append( source );
+				idStr sourceLine( programGLSL );
+				lines.Append( sourceLine );
 				for ( int index = 0, ofs = lines[index].Find( separator ); ofs != -1; index++, ofs = lines[index].Find( separator ) ) {
 					lines.Append( lines[index].c_str() + ofs + 1 );
 					lines[index].CapLength( ofs );

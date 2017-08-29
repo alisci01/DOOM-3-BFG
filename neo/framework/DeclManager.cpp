@@ -1692,7 +1692,7 @@ void idDeclManagerLocal::TouchDecl_f( const idCmdArgs &args ) {
 	if ( args.Argc() != 3 ) {
 		common->Printf( "usage: touch <type> <name>\n" );
 		common->Printf( "valid types: " );
-		for ( int i = 0 ; i < declManagerLocal.declTypes.Num() ; i++ ) {
+		for ( i = 0 ; i < declManagerLocal.declTypes.Num() ; i++ ) {
 			if ( declManagerLocal.declTypes[i] ) {
 				common->Printf( "%s ", declManagerLocal.declTypes[i]->typeName.c_str() );
 			}

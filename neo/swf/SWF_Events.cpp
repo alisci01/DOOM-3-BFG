@@ -78,12 +78,12 @@ idSWFScriptObject * idSWF::HitTest( idSWFSpriteInstance * spriteInstance, const 
 			}
 		} else if ( entry->type == SWF_DICT_SHAPE && ( parentObject != NULL ) ) {
 			idSWFShape * shape = entry->shape;
-			for ( int i = 0; i < shape->fillDraws.Num(); i++ ) {
-				const idSWFShapeDrawFill & fill = shape->fillDraws[i];
-				for ( int j = 0; j < fill.indices.Num(); j+=3 ) {
-					idVec2 xy1 = renderState2.matrix.Transform( fill.startVerts[fill.indices[j+0]] );
-					idVec2 xy2 = renderState2.matrix.Transform( fill.startVerts[fill.indices[j+1]] );
-					idVec2 xy3 = renderState2.matrix.Transform( fill.startVerts[fill.indices[j+2]] );
+			for ( int j = 0; j < shape->fillDraws.Num(); j++ ) {
+				const idSWFShapeDrawFill & fill = shape->fillDraws[j];
+				for ( int k = 0; k < fill.indices.Num(); k+=3 ) {
+					idVec2 xy1 = renderState2.matrix.Transform( fill.startVerts[fill.indices[k+0]] );
+					idVec2 xy2 = renderState2.matrix.Transform( fill.startVerts[fill.indices[k+1]] );
+					idVec2 xy3 = renderState2.matrix.Transform( fill.startVerts[fill.indices[k+2]] );
 
 					idMat3 edgeEquations;
 					edgeEquations[0].Set( xy1.x + xOffset, xy1.y + yOffset, 1.0f );
@@ -245,13 +245,13 @@ bool idSWF::HandleEvent( const sysEvent_t * event ) {
 						return true;
 					}
 
-					idSWFScriptVar var = hitObject->Get( "onDrag" );
-					if ( var.IsFunction() ) {
+					idSWFScriptVar onDragVar = hitObject->Get( "onDrag" );
+					if ( onDragVar.IsFunction() ) {
 						idSWFParmList parms;
 						parms.Append( mouseX );
 						parms.Append( mouseY );
 						parms.Append( true );
-						var.GetFunction()->Call( hitObject, parms );
+						onDragVar.GetFunction()->Call( hitObject, parms );
 						parms.Clear();
 						return true;
 					}

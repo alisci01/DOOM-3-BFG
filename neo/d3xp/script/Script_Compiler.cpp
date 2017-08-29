@@ -2625,18 +2625,18 @@ void idCompiler::CompileFile( const char *text, const char *filename, bool toCon
 	}
 		
 	catch( idCompileError &err ) {
-		idStr error;
+		idStr errorStr;
 
 		if ( console ) {
 			// don't print line number of an error if were calling script from the console using the "script" command
-			sprintf( error, "Error: %s\n", err.GetError() );
+			sprintf( errorStr, "Error: %s\n", err.GetError() );
 		} else {
-			sprintf( error, "Error: file %s, line %d: %s\n", gameLocal.program.GetFilename( currentFileNumber ), currentLineNumber, err.GetError() );
+			sprintf( errorStr, "Error: file %s, line %d: %s\n", gameLocal.program.GetFilename( currentFileNumber ), currentLineNumber, err.GetError() );
 		}
 
 		parser.FreeSource();
 
-		throw idCompileError( error );
+		throw idCompileError( errorStr );
 	}
 
 	parser.FreeSource();

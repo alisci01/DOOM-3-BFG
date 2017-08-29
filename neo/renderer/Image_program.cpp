@@ -505,7 +505,7 @@ static bool R_ParseImageProgram_r( idLexer &src, byte **pic, int *width, int *he
 	}
 
 	if ( !token.Icmp( "scale" ) ) {
-		float	scale[4];
+		float	scaleVec[4];
 		int		i;
 
 		MatchAndAppendToken( src, "(" );
@@ -516,12 +516,12 @@ static bool R_ParseImageProgram_r( idLexer &src, byte **pic, int *width, int *he
 			MatchAndAppendToken( src, "," );
 			src.ReadToken( &token );
 			AppendToken( token );
-			scale[i] = token.GetFloatValue();
+			scaleVec[i] = token.GetFloatValue();
 		}
 
 		// process it
 		if ( pic ) {
-			R_ImageScale( *pic, *width, *height, scale );
+			R_ImageScale( *pic, *width, *height, scaleVec );
 		}
 
 		MatchAndAppendToken( src, ")" );

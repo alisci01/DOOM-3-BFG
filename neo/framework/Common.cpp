@@ -1202,9 +1202,9 @@ void idCommonLocal::Init( int argc, const char * const * argv, const char *cmdli
 		// No longer need the splash screen
 		if ( splashScreen != NULL ) {
 			for ( int i = 0; i < splashScreen->GetNumStages(); i++ ) {
-				idImage * image = splashScreen->GetStage( i )->texture.image;
-				if ( image != NULL ) {
-					image->PurgeImage();
+				idImage * splashImage = splashScreen->GetStage( i )->texture.image;
+				if ( splashImage != NULL ) {
+					splashImage->PurgeImage();
 				}
 			}
 		}

@@ -633,16 +633,16 @@ int idRenderWorldLocal::CommonChildrenArea_r( areaNode_t *node ) {
 		nums[1] = nums[0];
 	}
 
-	int	common;
+	int	commonChildrenName;
 	if ( nums[0] == nums[1] ) {
-		common = nums[0];
+		commonChildrenName = nums[0];
 	} else {
-		common = CHILDREN_HAVE_MULTIPLE_AREAS;
+		commonChildrenName = CHILDREN_HAVE_MULTIPLE_AREAS;
 	}
 
-	node->commonChildrenArea = common;
+	node->commonChildrenArea = commonChildrenName;
 
-	return common;
+	return commonChildrenName;
 }
 
 /*
@@ -779,21 +779,21 @@ bool idRenderWorldLocal::InitFromMap( const char *name ) {
 				file->ReadString( type );
 				type.ToLower();
 				if ( type == "model" ) {
-					idRenderModel * lastModel = ReadBinaryModel( file );
-					if ( lastModel == NULL ) {
+					idRenderModel * regModel = ReadBinaryModel( file );
+					if ( regModel == NULL ) {
 						loaded = false;
 						break;
 					}
-					renderModelManager->AddModel( lastModel );
-					localModels.Append( lastModel );
+					renderModelManager->AddModel( regModel );
+					localModels.Append( regModel );
 				} else if ( type == "shadowmodel" ) {
-					idRenderModel * lastModel = ReadBinaryModel( file );
-					if ( lastModel == NULL ) {
+					idRenderModel * shadowModel = ReadBinaryModel( file );
+					if ( shadowModel == NULL ) {
 						loaded = false;
 						break;
 					}
-					renderModelManager->AddModel( lastModel );
-					localModels.Append( lastModel );
+					renderModelManager->AddModel( shadowModel );
+					localModels.Append( shadowModel );
 				} else if ( type == "interareaportals" ) {
 					ReadBinaryAreaPortals( file );
 				} else if ( type == "nodes" ) {

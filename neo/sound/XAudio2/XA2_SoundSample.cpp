@@ -217,13 +217,13 @@ void idSoundSample_XAudio2::LoadResource() {
 				WriteAllSamples( GetName() );
 
 				if ( sampleName.Find( "/vo/" ) >= 0 ) {
-					for ( int i = 0; i < Sys_NumLangs(); i++ ) {
-						const char * lang = Sys_Lang( i );
+					for ( int j = 0; j < Sys_NumLangs(); j++ ) {
+						const char * lang = Sys_Lang( j );
 						if ( idStr::Icmp( lang, ID_LANG_ENGLISH ) == 0 ) {
 							continue;
 						}
 						idStrStatic< MAX_OSPATH > locName = GetName();
-						locName.Replace( "/vo/", va( "/vo/%s/", Sys_Lang( i ) ) );
+						locName.Replace( "/vo/", va( "/vo/%s/", Sys_Lang( j ) ) );
 						WriteAllSamples( locName );
 					}
 				}

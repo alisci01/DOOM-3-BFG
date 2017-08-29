@@ -531,15 +531,15 @@ void idAI::Save( idSaveGame *savefile ) const {
 
 	savefile->WriteBool( GetPhysics() == static_cast<const idPhysics *>(&physicsObj) );
 
-	savefile->WriteInt(funcEmitters.Num());
-	for(int i = 0; i < funcEmitters.Num(); i++) {
+	savefile->WriteInt( funcEmitters.Num() );
+	for( i = 0; i < funcEmitters.Num(); i++ ) {
 		funcEmitter_t* emitter = funcEmitters.GetIndex(i);
-		savefile->WriteString(emitter->name);
-		savefile->WriteJoint(emitter->joint);
-		savefile->WriteObject(emitter->particle);
+		savefile->WriteString( emitter->name );
+		savefile->WriteJoint( emitter->joint );
+		savefile->WriteObject( emitter->particle );
 	}
 
-	harvestEnt.Save( savefile);
+	harvestEnt.Save( savefile );
 }
 
 /*
@@ -707,7 +707,7 @@ void idAI::Restore( idRestoreGame *savefile ) {
 
 
 	//Clean up the emitters
-	for(int i = 0; i < funcEmitters.Num(); i++) {
+	for( i = 0; i < funcEmitters.Num(); i++ ) {
 		funcEmitter_t* emitter = funcEmitters.GetIndex(i);
 		if(emitter->particle) {
 			//Destroy the emitters
@@ -718,7 +718,7 @@ void idAI::Restore( idRestoreGame *savefile ) {
 
 	int emitterCount;
 	savefile->ReadInt( emitterCount );
-	for(int i = 0; i < emitterCount; i++) {
+	for( i = 0; i < emitterCount; i++ ) {
 		funcEmitter_t newEmitter;
 		memset(&newEmitter, 0, sizeof(newEmitter));
 
@@ -3731,7 +3731,7 @@ idAI::EnemyPositionValid
 =====================
 */
 bool idAI::EnemyPositionValid() const {
-	trace_t	tr;
+	trace_t	trace;
 	idVec3	muzzle;
 	idMat3	axis;
 
@@ -3743,8 +3743,8 @@ bool idAI::EnemyPositionValid() const {
 		return true;
 	}
 
-	gameLocal.clip.TracePoint( tr, GetEyePosition(), lastVisibleEnemyPos + lastVisibleEnemyEyeOffset, MASK_OPAQUE, this );
-	if ( tr.fraction < 1.0f ) {
+	gameLocal.clip.TracePoint( trace, GetEyePosition(), lastVisibleEnemyPos + lastVisibleEnemyEyeOffset, MASK_OPAQUE, this );
+	if ( trace.fraction < 1.0f ) {
 		// can't see the area yet, so don't know if he's there or not
 		return true;
 	}
@@ -3836,11 +3836,11 @@ void idAI::SetEnemyPosition() {
 		}
 
 		if ( move.moveType == MOVETYPE_FLY ) {
-			predictedPath_t path;
+			predictedPath_t predictedPath;
 			idVec3 end = move.moveDest;
 			end.z += enemyEnt->EyeOffset().z + fly_offset;
-			idAI::PredictPath( this, aas, move.moveDest, end - move.moveDest, 1000, 1000, SE_BLOCKED, path );
-			move.moveDest = path.endPos;
+			idAI::PredictPath( this, aas, move.moveDest, end - move.moveDest, 1000, 1000, SE_BLOCKED, predictedPath );
+			move.moveDest = predictedPath.endPos;
 			move.toAreaNum = PointReachableAreaNum( move.moveDest, 1.0f );
 		}
 	}
@@ -4200,7 +4200,7 @@ idProjectile *idAI::LaunchProjectile( const char *jointname, idEntity *target, b
 	idVec3				muzzle;
 	idVec3				dir;
 	idVec3				start;
-	trace_t				tr;
+	trace_t				trace;
 	idBounds			projBounds;
 	float				distance;
 	const idClipModel	*projClip;
@@ -4273,8 +4273,8 @@ idProjectile *idAI::LaunchProjectile( const char *jointname, idEntity *target, b
 			start = ownerBounds.GetCenter();
 		}
 
-		gameLocal.clip.Translation( tr, start, muzzle, projClip, axis, MASK_SHOT_RENDERMODEL, this );
-		muzzle = tr.endpos;
+		gameLocal.clip.Translation( trace, start, muzzle, projClip, axis, MASK_SHOT_RENDERMODEL, this );
+		muzzle = trace.endpos;
 	}
 
 	// set aiming direction
@@ -4365,7 +4365,7 @@ void idAI::DirectDamage( const char *meleeDefName, idEntity *ent ) {
 	}
 
 	if ( !ent->fl.takedamage ) {
-		const idSoundShader *shader = declManager->FindSound(meleeDef->GetString( "snd_miss" ));
+		shader = declManager->FindSound(meleeDef->GetString( "snd_miss" ));
 		StartSoundShader( shader, SND_CHANNEL_DAMAGE, 0, false, NULL );
 		return;
 	}

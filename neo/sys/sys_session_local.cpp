@@ -3945,11 +3945,11 @@ CONSOLE_COMMAND( Net_DropClient, "Drop a client", 0 ) {
 idSessionLocal::DropClient
 ========================
 */
-void idSessionLocal::DropClient( int peerNum, int session ) {
-	if ( session == 1 || session >= 2 ) {
+void idSessionLocal::DropClient( int peerNum, int sessionNum ) {
+	if ( sessionNum == 1 || sessionNum >= 2 ) {
 		GetPartyLobby().DisconnectPeerFromSession( peerNum );
 	}
-	if ( session == 0 || session >= 2 ) {
+	if ( sessionNum == 0 || sessionNum >= 2 ) {
 		GetGameLobby().DisconnectPeerFromSession( peerNum );
 	}
 }

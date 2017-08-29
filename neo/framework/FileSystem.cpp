@@ -972,10 +972,10 @@ void idFileSystemLocal::WriteResourcePacks() {
 	idList< idFileManifest > manifests;				// list of all manifest files
 	// load all file manifests
 	for ( int i = 0; i < manifestFiles.Num(); i++ ) {
-		idStr path = "maps/";
-		path += manifestFiles[ i ];
+		idStr manifestPath = "maps/";
+		manifestPath += manifestFiles[ i ];
 		idFileManifest manifest;
-		if ( manifest.LoadManifest( path ) ) {
+		if ( manifest.LoadManifest( manifestPath ) ) {
 			//manifest.Print();
 			manifest.RemoveAll( va( "strings/%s", ID_LANG_ENGLISH ) );	// remove all .lang files
 			manifest.RemoveAll( va( "strings/%s", ID_LANG_FRENCH ) );
@@ -990,13 +990,13 @@ void idFileSystemLocal::WriteResourcePacks() {
 	idList< idPreloadManifest > preloadManifests;	// list of all preload manifest files
 	// load all preload manifests
 	for ( int i = 0; i < preloadFiles.Num(); i++ ) {
-		idStr path = "maps/";
-		path += preloadFiles[ i ];
-		if ( path.Find( "_startup", false ) >= 0 ) {
+		idStr preloadManifestPath = "maps/";
+		preloadManifestPath += preloadFiles[ i ];
+		if ( preloadManifestPath.Find( "_startup", false ) >= 0 ) {
 			continue;
 		}
 		idPreloadManifest preload;
-		if ( preload.LoadManifest( path ) ) {
+		if ( preload.LoadManifest( preloadManifestPath ) ) {
 			preloadManifests.Append( preload );
 			//preload.Print();
 		}
@@ -1434,7 +1434,7 @@ const char * idFileSystemLocal::BuildOSPath( const char * base, const char * rel
 idFileSystemLocal::BuildOSPath
 ===================
 */
-const char *idFileSystemLocal::BuildOSPath( const char *base, const char *game, const char *relativePath ) {
+const char *idFileSystemLocal::BuildOSPath( const char *baseDir, const char *gameDir, const char *relativePath ) {
 	static char OSPath[MAX_STRING_CHARS];
 	idStr newPath;
 
@@ -1443,10 +1443,10 @@ const char *idFileSystemLocal::BuildOSPath( const char *base, const char *game, 
 		return relativePath;
 	}
 
-	idStr strBase = base;
+	idStr strBase = baseDir;
 	strBase.StripTrailing( '/' );
 	strBase.StripTrailing( '\\' );
-	sprintf( newPath, "%s/%s/%s", strBase.c_str(), game, relativePath );
+	sprintf( newPath, "%s/%s/%s", strBase.c_str(), gameDir, relativePath );
 	ReplaceSeparators( newPath );
 	idStr::Copynz( OSPath, newPath, sizeof( OSPath ) );
 	return OSPath;
@@ -2338,7 +2338,7 @@ void idFileSystemLocal::CreateCRCsForResourceFileList( const idFileList & list )
 		crcFilename.SetFileExtension( ".crc" );
 		std::auto_ptr<idFile> crcOutputFile( fileSystem->OpenFileWrite( crcFilename, "fs_basepath" ) );
 		if ( crcOutputFile.get() == NULL ) {
-			idLib::Printf( "Error writing CRC file %s.\n", crcFilename );
+			idLib::Printf( "Error writing CRC file %s.\n", crcFilename.c_str() );
 			continue;
 		}
 		
@@ -2856,25 +2856,25 @@ idFile *idFileSystemLocal::OpenFileReadFlags( const char *relativePath, int sear
 				copypath += name;
 
 				if ( fs_buildResources.GetBool() ) {
-					idStrStatic< MAX_OSPATH > relativePath = OSPathToRelativePath( copypath );
-					relativePath.BackSlashesToSlashes();
-					relativePath.ToLower();
+					idStrStatic< MAX_OSPATH > relativeCopyPath = OSPathToRelativePath( copypath );
+					relativeCopyPath.BackSlashesToSlashes();
+					relativeCopyPath.ToLower();
 
-					if ( IsSoundSample( relativePath ) ) {
-						idStrStatic< MAX_OSPATH > samplePath = relativePath;
+					if ( IsSoundSample( relativeCopyPath ) ) {
+						idStrStatic< MAX_OSPATH > samplePath = relativeCopyPath;
 						samplePath.SetFileExtension( "idwav" );
 						if ( samplePath.Find( "generated/" ) == -1 ) {
 							samplePath.Insert( "generated/", 0 );
 						}
 						fileManifest.AddUnique( samplePath );
-						if ( relativePath.Find( "/vo/", false ) >= 0 ) {
+						if ( relativeCopyPath.Find( "/vo/", false ) >= 0 ) {
 							// this is vo so add the language variants
 							for ( int i = 0; i < Sys_NumLangs(); i++ ) {
 								const char *lang = Sys_Lang( i );
 								if ( idStr::Icmp( lang, ID_LANG_ENGLISH ) == 0 ) {
 									continue;
 								}
-								samplePath = relativePath;
+								samplePath = relativeCopyPath;
 								samplePath.Replace( "/vo/", va( "/vo/%s/", lang ) );
 								samplePath.SetFileExtension( "idwav" );
 								if ( samplePath.Find( "generated/" ) == -1 ) {
@@ -2884,22 +2884,22 @@ idFile *idFileSystemLocal::OpenFileReadFlags( const char *relativePath, int sear
 
 							}
 						}
-					} else if ( relativePath.Icmpn( "guis/", 5 ) == 0 ) {
+					} else if ( relativeCopyPath.Icmpn( "guis/", 5 ) == 0 ) {
 						// this is a gui so add the language variants
 						for ( int i = 0; i < Sys_NumLangs(); i++ ) {
 							const char *lang = Sys_Lang( i );
 							if ( idStr::Icmp( lang, ID_LANG_ENGLISH ) == 0 ) {
-								fileManifest.Append( relativePath );
+								fileManifest.Append( relativeCopyPath );
 								continue;
 							}
-							idStrStatic< MAX_OSPATH > guiPath = relativePath;
+							idStrStatic< MAX_OSPATH > guiPath = relativeCopyPath;
 							guiPath.Replace( "guis/", va( "guis/%s/", lang ) );
 							fileManifest.Append( guiPath );
 						}
 					} else {
 						// never add .amp files
-						if ( strstr( relativePath, ".amp" ) == NULL ) {
-							fileManifest.Append( relativePath );
+						if ( strstr( relativeCopyPath, ".amp" ) == NULL ) {
+							fileManifest.Append( relativeCopyPath );
 						}
 					}
 

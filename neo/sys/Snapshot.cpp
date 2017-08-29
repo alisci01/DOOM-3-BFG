@@ -690,9 +690,9 @@ bool idSnapShot::ReadDelta( idFile * file, int visIndex ) {
 			objectSize_t compareSize = Min( newsize, state.buffer.Size() );
 
 			for ( objectSize_t i = 0; i < compareSize; i++ ) {
-				uint8 delta = 0;
-				file->ReadBig<byte>( delta );
-				newbuffer[i] = state.buffer[i] + delta;
+				uint8 newDelta = 0;
+				file->ReadBig<byte>( newDelta );
+				newbuffer[i] = state.buffer[i] + newDelta;
 			}
 			
 			if ( newsize > compareSize ) {

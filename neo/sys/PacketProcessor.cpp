@@ -448,9 +448,9 @@ int idPacketProcessor::ProcessIncoming( int time, sessionId_t expectedSessionID,
 		
 	if ( header.Value() == FRAGMENT_END ) {
 		// Done reconstructing the msg
-		idBitMsg msg( msgBuffer, sizeof( msgBuffer ) );
-		msg.SetSize( msgWritePos );
-		return FinalizeRead( msg, out, userData );
+		idBitMsg finMsg( msgBuffer, sizeof( msgBuffer ) );
+		finMsg.SetSize( msgWritePos );
+		return FinalizeRead( finMsg, out, userData );
 	}
 		
 	if ( !verify( header.Value() == FRAGMENT_START || header.Value() == FRAGMENT_MIDDLE ) ) {

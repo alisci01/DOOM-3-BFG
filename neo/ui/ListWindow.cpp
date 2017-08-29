@@ -474,9 +474,9 @@ void idListWindow::Draw(int time, float x, float y) {
 			rect.h = lineHeight;
 			dc->DrawFilledRect(rect.x, rect.y + pixelOffset, rect.w, rect.h, borderColor);
 			if ( flags & WIN_FOCUS ) {
-				idVec4 color = borderColor;
-				color.w = 1.0f;
-				dc->DrawRect(rect.x, rect.y + pixelOffset, rect.w, rect.h, 1.0f, color );
+				idVec4 borderColorFullAlpha = borderColor;
+				borderColorFullAlpha.w = 1.0f;
+				dc->DrawRect(rect.x, rect.y + pixelOffset, rect.w, rect.h, 1.0f, borderColorFullAlpha );
 			}
 		}
 		rect.y ++;

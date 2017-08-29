@@ -627,7 +627,7 @@ int Sys_PollMouseInputEvents( int mouseEvents[MAX_MOUSE_EVENTS][2] ) {
 					const int value = (int)polled_didod[i].dwData / WHEEL_DELTA;
 					const int key = value < 0 ? K_MWHEELDOWN : K_MWHEELUP;
 					const int iterations = abs( value );
-					for ( int i = 0; i < iterations; i++ ) {
+					for ( int j = 0; j < iterations; j++ ) {
 						Sys_QueEvent( SE_KEY, key, true, 0, NULL, 0 );
 						Sys_QueEvent( SE_KEY, key, false, 0, NULL, 0 );
 					}
@@ -711,17 +711,17 @@ void JoystickSamplingThread( void *data ) {
 			idScopedCriticalSection cs( win32.g_Joystick.mutexXis );
 
 			for ( int i = 0 ; i < MAX_JOYSTICKS ; i++ ) {
-				controllerState_t * cs = &win32.g_Joystick.controllers[i];
+				controllerState_t * controllerState = &win32.g_Joystick.controllers[i];
 
 				if ( !validData[i] ) {
-					cs->valid = false;
+					controllerState->valid = false;
 					continue;
 				}
-				cs->valid = true;
+				controllerState->valid = true;
 
 				XINPUT_STATE& current = joyData[i];
 
-				cs->current = current;
+				controllerState->current = current;
 
 				// Switch from using cs->current to current to reduce chance of Load-Hit-Store on consoles
 
@@ -731,7 +731,7 @@ void JoystickSamplingThread( void *data ) {
 					return numEvents;
 				}
 #endif
-				cs->buttonBits |= current.Gamepad.wButtons;
+				controllerState->buttonBits |= current.Gamepad.wButtons;
 			}
 		}
 

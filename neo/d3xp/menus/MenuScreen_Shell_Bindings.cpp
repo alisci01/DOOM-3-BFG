@@ -267,13 +267,13 @@ void idMenuScreen_Shell_Bindings::UpdateBindingDisplay() {
 					"JOY1", "JOY2", "JOY3", "JOY4", "JOY5", "JOY6",
 					"JOY_TRIGGER1", "JOY_TRIGGER2", 0
 				};
-				for ( int i = 0; i < joyBinds.Num(); i++ ) {
-					if ( joyBinds[i].Icmpn( "JOY_STICK", 9 ) == 0 ) {
+				for ( int j = 0; j < joyBinds.Num(); j++ ) {
+					if ( joyBinds[j].Icmpn( "JOY_STICK", 9 ) == 0 ) {
 						continue; // Can't rebind the sticks, so don't even show them
 					}
 					bool hasImage = false;
 					for ( const char ** b = buttonsWithImages; *b != 0; b++ ) {
-						if ( joyBinds[i].Icmp( *b ) == 0 ) {
+						if ( joyBinds[j].Icmp( *b ) == 0 ) {
 							hasImage = true;
 							break;
 						}
@@ -283,10 +283,10 @@ void idMenuScreen_Shell_Bindings::UpdateBindingDisplay() {
 					}
 					if ( hasImage ) {
 						bindings.Append( '<' );
-						bindings.Append( joyBinds[i] );
+						bindings.Append( joyBinds[j] );
 						bindings.Append( '>' );
 					} else {
-						bindings.Append( joyBinds[i] );
+						bindings.Append( joyBinds[j] );
 					}
 				}
 				bindings.Replace( "JOY_DPAD", "DPAD" );

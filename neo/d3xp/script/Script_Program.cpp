@@ -1249,7 +1249,7 @@ idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scop
 			scope->value.functionPtr->locals += type->Size();
 		} else if ( scope->TypeDef()->Inherits( &type_object ) ) {
 			idTypeDef	newtype( ev_field, NULL, "float field", 0, &type_float );
-			idTypeDef	*type = GetType( newtype, true );
+			idTypeDef	*newType = GetType( newtype, true );
 
 			// set the value to the variable's position in the object
 			def->value.ptrOffset = scope->TypeDef()->Size();
@@ -1257,14 +1257,14 @@ idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scop
 			// make automatic defs for the vectors elements
 			// origin can be accessed as origin_x, origin_y, and origin_z
 			sprintf( element, "%s_x", def->Name() );
-			def_x = AllocDef( type, element, scope, constant );
+			def_x = AllocDef( newType, element, scope, constant );
 
 			sprintf( element, "%s_y", def->Name() );
-			def_y = AllocDef( type, element, scope, constant );
+			def_y = AllocDef( newType, element, scope, constant );
 			def_y->value.ptrOffset = def_x->value.ptrOffset + type_float.Size();
 
 			sprintf( element, "%s_z", def->Name() );
-			def_z = AllocDef( type, element, scope, constant );
+			def_z = AllocDef( newType, element, scope, constant );
 			def_z->value.ptrOffset = def_y->value.ptrOffset + type_float.Size();
 		} else {
 			// make automatic defs for the vectors elements
@@ -1759,7 +1759,7 @@ void idProgram::CompileStats() {
 idProgram::CompileText
 ================
 */
-bool idProgram::CompileText( const char *source, const char *text, bool console ) {
+bool idProgram::CompileText( const char *source, const char *text, bool toConsole ) {
 	idCompiler	compiler;
 	int			i;
 	idVarDef	*def;
@@ -1770,7 +1770,7 @@ bool idProgram::CompileText( const char *source, const char *text, bool console 
 	filenum = GetFilenum( ospath );
 
 	try {
-		compiler.CompileFile( text, filename, console );
+		compiler.CompileFile( text, filename, toConsole );
 
 		// check to make sure all functions prototyped have code
 		for( i = 0; i < varDefs.Num(); i++ ) {
@@ -1784,7 +1784,7 @@ bool idProgram::CompileText( const char *source, const char *text, bool console 
 	}
 	
 	catch( idCompileError &err ) {
-		if ( console ) {
+		if ( toConsole ) {
 			gameLocal.Printf( "%s\n", err.GetError() );
 			return false;
 		} else {
@@ -1792,7 +1792,7 @@ bool idProgram::CompileText( const char *source, const char *text, bool console 
 		}
 	};
 
-	if ( !console ) {
+	if ( !toConsole ) {
 		CompileStats();
 	}
 

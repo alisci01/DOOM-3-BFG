@@ -212,28 +212,28 @@ void Script_Transition(idWindow *window, idList<idGSWinVar, TAG_OLD_UI> *src) {
 			return;
 		}
 		int time = atoi(*timeStr);
-		float ac = 0.0f;
-		float dc = 0.0f;
+		float acf = 0.0f;
+		float dcf = 0.0f;
 		if (src->Num() > 4) {
 			idWinStr *acv = dynamic_cast<idWinStr*>((*src)[4].var);
 			idWinStr *dcv = dynamic_cast<idWinStr*>((*src)[5].var);
 			assert(acv && dcv);
-			ac = atof(*acv);
-			dc = atof(*dcv);
+			acf = atof(*acv);
+			dcf = atof(*dcv);
 		}
 				
 		if (vec4) {
 			vec4->SetEval(false);
-			window->AddTransition(vec4, *from, *to, time, ac, dc);
+			window->AddTransition(vec4, *from, *to, time, acf, dcf);
 			// 
 			//  added float variable					
 		} else if ( val ) {
 			val->SetEval ( false );
-			window->AddTransition(val, *from, *to, time, ac, dc);
+			window->AddTransition(val, *from, *to, time, acf, dcf);
 			// 
 		} else {
 			rect->SetEval(false);
-			window->AddTransition(rect, *from, *to, time, ac, dc);
+			window->AddTransition(rect, *from, *to, time, acf, dcf);
 		}
 		window->StartTransition();
 	}
@@ -455,14 +455,14 @@ void idGuiScript::FixupParms(idWindow *win) {
 		}
 		int parmCount = parms.Num();
 		for (int i = 1; i < parmCount; i++) {
-			idWinStr *str = dynamic_cast<idWinStr*>(parms[i].var);		
-			if (idStr::Icmpn(*str, "gui::", 5) == 0) {
+			idWinStr *varStr = dynamic_cast<idWinStr*>(parms[i].var);		
+			if (idStr::Icmpn(*varStr, "gui::", 5) == 0) {
 
 				//  always use a string here, no point using a float if it is one
 				//  FIXME: This creates duplicate variables, while not technically a problem since they
 				//  are all bound to the same guiDict, it does consume extra memory and is generally a bad thing
 				idWinStr* defvar = new (TAG_OLD_UI) idWinStr();
-				defvar->Init ( *str, win );
+				defvar->Init ( *varStr, win );
 				win->AddDefinedVar ( defvar );
 				delete parms[i].var;
 				parms[i].var = defvar;
@@ -475,26 +475,26 @@ void idGuiScript::FixupParms(idWindow *win) {
 				//	parms[i].own = false;
 				//}
 				// 
-			} else if ((*str[0]) == '$') {
+			} else if ((*varStr[0]) == '$') {
 				// 
 				//  dont include the $ when asking for variable
-				dest = win->GetGui()->GetDesktop()->GetWinVarByName((const char*)(*str) + 1, true);
+				dest = win->GetGui()->GetDesktop()->GetWinVarByName((const char*)(*varStr) + 1, true);
 				// 					
 				if (dest) {
 					delete parms[i].var;
 					parms[i].var = dest;
 					parms[i].own = false;
 				}
-			} else if ( idStr::Cmpn( str->c_str(), STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
-				str->Set( idLocalization::GetString( str->c_str() ) );
+			} else if ( idStr::Cmpn( varStr->c_str(), STRTABLE_ID, STRTABLE_ID_LENGTH ) == 0 ) {
+				varStr->Set( idLocalization::GetString( varStr->c_str() ) );
 			} else if ( precacheBackground ) {
-				const idMaterial *mat = declManager->FindMaterial( str->c_str() );
+				const idMaterial *mat = declManager->FindMaterial( varStr->c_str() );
 				mat->SetSort( SS_GUI );
 			} else if ( precacheSounds ) {
 				// Search for "play <...>"
 				idToken token;
 				idParser parser( LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-				parser.LoadMemory(str->c_str(), str->Length(), "command");
+				parser.LoadMemory(varStr->c_str(), varStr->Length(), "command");
 
 				while ( parser.ReadToken(&token) ) {
 					if ( token.Icmp("play") == 0 ) {

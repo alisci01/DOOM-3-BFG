@@ -3895,7 +3895,7 @@ void idMatX::HessenbergReduction( idMatX &H ) {
 
 	// accumulate transformations
 	Identity();
-	for ( int m = high - 1; m >= low + 1; m-- ) {
+	for ( m = high - 1; m >= low + 1; m-- ) {
 		if ( H[m][m-1] != 0.0f ) {
 			for ( i = m + 1; i <= high; i++ ) {
 				v[i] = H[i][m-1];

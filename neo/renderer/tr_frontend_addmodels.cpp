@@ -614,12 +614,12 @@ void R_AddSingleModel( viewEntity_t * vEntity ) {
 				drawSurf_t * deformDrawSurf = R_DeformDrawSurf( baseDrawSurf );
 				if ( deformDrawSurf != NULL ) {
 					// any deforms may have created multiple draw surfaces
-					for ( drawSurf_t * surf = deformDrawSurf, * next = NULL; surf != NULL; surf = next ) {
-						next = surf->nextOnLight;
+					for ( drawSurf_t * drawSurf = deformDrawSurf, * next = NULL; drawSurf != NULL; drawSurf = next ) {
+						next = drawSurf->nextOnLight;
 
-						surf->linkChain = NULL;
-						surf->nextOnLight = vEntity->drawSurfs;
-						vEntity->drawSurfs = surf;
+						drawSurf->linkChain = NULL;
+						drawSurf->nextOnLight = vEntity->drawSurfs;
+						vEntity->drawSurfs = drawSurf;
 					}
 				}
 			}

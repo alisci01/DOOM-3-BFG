@@ -1322,10 +1322,10 @@ bool idRenderModelStatic::ConvertASEToModelSurfaces( const struct aseModel_s *as
 			tri->verts[ j ].SetNormal( mv->normal );
 			*(unsigned *)tri->verts[j].color = *(unsigned *)mv->color;
 			if ( mesh->numTVFaces == mesh->numFaces && mesh->numTVertexes != 0 ) {
-				const idVec2 &tv = mesh->tvertexes[ mv->tv ];
-				float u = tv.x * uTiling + uOffset;
-				float v = tv.y * vTiling + vOffset;
-				tri->verts[j].SetTexCoord( u * textureCos + v * textureSin, u * -textureSin + v * textureCos );
+				const idVec2 &texVert = mesh->tvertexes[ mv->tv ];
+				float uCoord = texVert.x * uTiling + uOffset;
+				float vCoord = texVert.y * vTiling + vOffset;
+				tri->verts[j].SetTexCoord( uCoord * textureCos + vCoord * textureSin, uCoord * -textureSin + vCoord * textureCos );
 			}
 		}
 
@@ -2171,10 +2171,10 @@ bool idRenderModelStatic::ConvertMAToModelSurfaces (const struct maModel_s *ma )
 			tri->verts[ j ].SetNormal( mv->normal );
 			*(unsigned *)tri->verts[j].color = *(unsigned *)mv->color;
 			if ( mesh->numTVertexes != 0 ) {
-				const idVec2 &tv = mesh->tvertexes[ mv->tv ];
-				float u = tv.x * uTiling + uOffset;
-				float v = tv.y * vTiling + vOffset;
-				tri->verts[j].SetTexCoord( u * textureCos + v * textureSin, u * -textureSin + v * textureCos );
+				const idVec2 &texVert = mesh->tvertexes[ mv->tv ];
+				float uComp = texVert.x * uTiling + uOffset;
+				float vComp = texVert.y * vTiling + vOffset;
+				tri->verts[j].SetTexCoord( uComp * textureCos + vComp * textureSin, uComp * -textureSin + vComp * textureCos );
 			}
 		}
 

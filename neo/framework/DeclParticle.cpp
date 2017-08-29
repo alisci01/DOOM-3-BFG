@@ -1270,7 +1270,7 @@ int	idParticleStage::ParticleVerts( particleGen_t *g, idVec3 origin, idDrawVert 
 			trailTime = 0.5f;
 		}
 
-		float height = 1.0f / ( 1 + numTrails );
+		float partHeight = 1.0f / ( 1 + numTrails );
 		float t = 0;
 
 		for ( int i = 0 ; i <= numTrails ; i++ ) {
@@ -1312,10 +1312,10 @@ int	idParticleStage::ParticleVerts( particleGen_t *g, idVec3 origin, idDrawVert 
 			// modify texcoords
 			verts_p[0].SetTexCoordT( t );
 			verts_p[1].SetTexCoordT( t );
-			verts_p[2].SetTexCoordT( t + height );
-			verts_p[3].SetTexCoordT( t + height );
+			verts_p[2].SetTexCoordT( t + partHeight );
+			verts_p[3].SetTexCoordT( t + partHeight );
 
-			t += height;
+			t += partHeight;
 
 			verts_p += 4;
 

@@ -248,7 +248,7 @@ void BOBrick::WriteToSaveGame( idFile *savefile ) {
 BOBrick::ReadFromSaveGame
 ======================
 */
-void BOBrick::ReadFromSaveGame( idFile *savefile, idGameBustOutWindow *game ) {
+void BOBrick::ReadFromSaveGame( idFile *savefile, idGameBustOutWindow *gameWindow ) {
 	savefile->Read( &x, sizeof(x) );
 	savefile->Read( &y, sizeof(y) );
 	savefile->Read( &width, sizeof(width) );
@@ -259,7 +259,7 @@ void BOBrick::ReadFromSaveGame( idFile *savefile, idGameBustOutWindow *game ) {
 
 	int index;
 	savefile->Read( &index, sizeof(index) );
-	ent = game->entities[index];
+	ent = gameWindow->entities[index];
 }
 
 /*

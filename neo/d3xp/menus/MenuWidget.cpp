@@ -175,9 +175,9 @@ void idMenuWidget::ReceiveEvent( const idWidgetEvent & event ) {
 	// the case, then you may need to increase the size of the focusChain list.
 	assert( focusRunawayCounter != 0 );
 	for ( int focusIndex = focusChain.Num() - 1; focusIndex >= 0; --focusIndex ) {
-		idMenuWidget * const focusedWidget = focusChain[ focusIndex ];
+		idMenuWidget * const focusChainWidget = focusChain[ focusIndex ];
 
-		if ( focusedWidget->ExecuteEvent( event ) ) {
+		if ( focusChainWidget->ExecuteEvent( event ) ) {
 			break;	// this widget has handled the event, so stop propagation
 		}
 	}

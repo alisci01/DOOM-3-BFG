@@ -1053,33 +1053,33 @@ static bool LDLT_Factor_SIMD( idMatX & mat, idVecX & invDiag, const int n ) {
 		float t2 = - mptr[2] * v[2];
 		float t3 = - mptr[3] * v[3];
 
-		int k = 4;
-		for ( ; k < i - 3; k += 4 ) {
-			v[k+0] = diag[k+0] * mptr[k+0];
-			v[k+1] = diag[k+1] * mptr[k+1];
-			v[k+2] = diag[k+2] * mptr[k+2];
-			v[k+3] = diag[k+3] * mptr[k+3];
+		int kt = 4;
+		for ( ; kt < i - 3; kt += 4 ) {
+			v[kt+0] = diag[kt+0] * mptr[kt+0];
+			v[kt+1] = diag[kt+1] * mptr[kt+1];
+			v[kt+2] = diag[kt+2] * mptr[kt+2];
+			v[kt+3] = diag[kt+3] * mptr[kt+3];
 
-			t0 -= mptr[k+0] * v[k+0];
-			t1 -= mptr[k+1] * v[k+1];
-			t2 -= mptr[k+2] * v[k+2];
-			t3 -= mptr[k+3] * v[k+3];
+			t0 -= mptr[kt+0] * v[kt+0];
+			t1 -= mptr[kt+1] * v[kt+1];
+			t2 -= mptr[kt+2] * v[kt+2];
+			t3 -= mptr[kt+3] * v[kt+3];
 		}
 
-		float m0 = ( i - k > 0 ) ? mptr[k+0] : 0.0f;
-		float m1 = ( i - k > 1 ) ? mptr[k+1] : 0.0f;
-		float m2 = ( i - k > 2 ) ? mptr[k+2] : 0.0f;
-		float m3 = ( i - k > 3 ) ? mptr[k+3] : 0.0f;
+		float tm0 = ( i - kt > 0 ) ? mptr[kt+0] : 0.0f;
+		float tm1 = ( i - kt > 1 ) ? mptr[kt+1] : 0.0f;
+		float tm2 = ( i - kt > 2 ) ? mptr[kt+2] : 0.0f;
+		float tm3 = ( i - kt > 3 ) ? mptr[kt+3] : 0.0f;
 
-		v[k+0] = diag[k+0] * m0;
-		v[k+1] = diag[k+1] * m1;
-		v[k+2] = diag[k+2] * m2;
-		v[k+3] = diag[k+3] * m3;
+		v[kt+0] = diag[kt+0] * tm0;
+		v[kt+1] = diag[kt+1] * tm1;
+		v[kt+2] = diag[kt+2] * tm2;
+		v[kt+3] = diag[kt+3] * tm3;
 
-		t0 -= m0 * v[k+0];
-		t1 -= m1 * v[k+1];
-		t2 -= m2 * v[k+2];
-		t3 -= m3 * v[k+3];
+		t0 -= tm0 * v[kt+0];
+		t1 -= tm1 * v[kt+1];
+		t2 -= tm2 * v[kt+2];
+		t3 -= tm3 * v[kt+3];
 
 		sum = t0 + t1 + t2 + t3;
 

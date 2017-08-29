@@ -288,27 +288,27 @@ void idMD5Mesh::ParseMesh( idLexer &parser, int numJoints, const idJointMat *joi
 
 		// sort the weights and take the four largest
 		int	weights[256];
-		const int numWeights = numWeightsForVertex[ i ];
-		for ( int j = 0; j < numWeights; j++ ) {
+		const int numVertWeights = numWeightsForVertex[ i ];
+		for ( int j = 0; j < numVertWeights; j++ ) {
 			weights[j] = firstWeightForVertex[i] + j;
 		}
 		// bubble sort
-		for ( int j = 0; j < numWeights; j++ ) {
-			for ( int k = 0; k < numWeights - 1 - j; k++ ) {
+		for ( int j = 0; j < numVertWeights; j++ ) {
+			for ( int k = 0; k < numVertWeights - 1 - j; k++ ) {
 				if ( tempWeights[weights[k]].jointWeight < tempWeights[weights[k+1]].jointWeight ) {
 					SwapValues( weights[k], weights[k+1] );
 				}
 			}
 		}
 
-		if ( numWeights > maxWeightsPerVert ) {
-			maxWeightsPerVert = numWeights;
+		if ( numVertWeights > maxWeightsPerVert ) {
+			maxWeightsPerVert = numVertWeights;
 		}
 
-		const int usedWeights = Min( MAX_VERTEX_WEIGHTS, numWeights );
+		const int usedWeights = Min( MAX_VERTEX_WEIGHTS, numVertWeights );
 
 		float totalWeight = 0;
-		for ( int j = 0; j < numWeights; j++ ) {
+		for ( int j = 0; j < numVertWeights; j++ ) {
 			totalWeight += tempWeights[weights[j]].jointWeight;
 		}
 		assert( totalWeight > 0.999f && totalWeight < 1.001f );

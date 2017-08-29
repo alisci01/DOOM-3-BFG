@@ -1284,7 +1284,7 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 	int numLobbyUsers = lobby.GetNumLobbyUsers();
 	int lobbyUserNum = 0;
 	assert( numLobbyUsers == 1 );
-	for ( int i = 0; i < MAX_PLAYERS && lobbyUserNum < numLobbyUsers; i++ ) {
+	for ( i = 0; i < MAX_PLAYERS && lobbyUserNum < numLobbyUsers; i++ ) {
 		if ( entities[i] == NULL ) {
 			continue;
 		}
@@ -4217,7 +4217,7 @@ void idGameLocal::SetCamera( idCamera *cam ) {
 		// show all the player models
 		for( i = 0; i < numClients; i++ ) {
 			if ( entities[ i ] ) {
-				idPlayer *client = static_cast< idPlayer* >( entities[ i ] );
+				client = static_cast< idPlayer* >( entities[ i ] );
 				client->ExitCinematic();
 			}
 		}

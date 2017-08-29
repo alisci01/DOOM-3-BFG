@@ -140,8 +140,8 @@ void listDevices_f( const idCmdArgs & args ) {
 			idLib::Printf( "     %s and %s\n", channelNames[0], channelNames[1] );
 		} else if ( channelNames.Num() > 2 ) {
 			idLib::Printf( "     %s", channelNames[0] );
-			for ( int i = 1; i < channelNames.Num() - 1; i++ ) {
-				idLib::Printf( ", %s", channelNames[i] );
+			for ( int j = 1; j < channelNames.Num() - 1; j++ ) {
+				idLib::Printf( ", %s", channelNames[j] );
 			}
 			idLib::Printf( ", and %s\n", channelNames[channelNames.Num() - 1] );
 		}
@@ -151,8 +151,8 @@ void listDevices_f( const idCmdArgs & args ) {
 			idLib::Printf( "     Default %s and %s\n", roles[0], roles[1] );
 		} else if ( roles.Num() > 2 ) {
 			idLib::Printf( "     Default %s", roles[0] );
-			for ( int i = 1; i < roles.Num() - 1; i++ ) {
-				idLib::Printf( ", %s", roles[i] );
+			for ( int j = 1; j < roles.Num() - 1; j++ ) {
+				idLib::Printf( ", %s", roles[j] );
 			}
 			idLib::Printf( ", and %s\n", roles[roles.Num() - 1] );
 		}

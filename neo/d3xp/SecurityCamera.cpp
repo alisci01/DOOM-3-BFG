@@ -287,7 +287,7 @@ bool idSecurityCamera::CanSeePlayer() {
 	int i;
 	float dist;
 	idPlayer *ent;
-	trace_t tr;
+	trace_t trace;
 	idVec3 dir;
 	pvsHandle_t handle;
 
@@ -320,8 +320,8 @@ bool idSecurityCamera::CanSeePlayer() {
 
 		eye = ent->EyeOffset();
 
-		gameLocal.clip.TracePoint( tr, GetPhysics()->GetOrigin(), ent->GetPhysics()->GetOrigin() + eye, MASK_OPAQUE, this );
-		if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == ent ) ) {
+		gameLocal.clip.TracePoint( trace, GetPhysics()->GetOrigin(), ent->GetPhysics()->GetOrigin() + eye, MASK_OPAQUE, this );
+		if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == ent ) ) {
 			gameLocal.pvs.FreeCurrentPVS( handle );
 			return true;
 		}

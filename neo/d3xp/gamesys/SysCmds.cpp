@@ -130,7 +130,7 @@ void Cmd_ListSpawnArgs_f( const idCmdArgs &args ) {
 
 	for ( i = 0; i < ent->spawnArgs.GetNumKeyVals(); i++ ) {
 		const idKeyValue *kv = ent->spawnArgs.GetKeyVal( i );
-		gameLocal.Printf( "\"%s\"  "S_COLOR_WHITE"\"%s\"\n", kv->GetKey().c_str(), kv->GetValue().c_str() );
+		gameLocal.Printf( "\"%s\"  " S_COLOR_WHITE "\"%s\"\n", kv->GetKey().c_str(), kv->GetValue().c_str() );
 	}
 }
 
@@ -403,8 +403,8 @@ void Cmd_Give_f( const idCmdArgs &args ) {
 		} else if ( idStr::Icmp( args.Argv(2), "all" ) == 0 ) {
 			// Give the personal PDA first
 			player->GivePDA( NULL, NULL );
-			for ( int i = 0; i < declManager->GetNumDecls( DECL_PDA ); i++ ) {
-				player->GivePDA( static_cast<const idDeclPDA *>( declManager->DeclByIndex( DECL_PDA, i ) ), NULL );
+			for ( int j = 0; j < declManager->GetNumDecls( DECL_PDA ); j++ ) {
+				player->GivePDA( static_cast<const idDeclPDA *>( declManager->DeclByIndex( DECL_PDA, j ) ), NULL );
 			}
 		} else {
 			const idDeclPDA * pda = static_cast<const idDeclPDA *>( declManager->FindType( DECL_PDA, args.Argv(2), false ) );
@@ -1369,7 +1369,7 @@ static void Cmd_ListAnims_f( const idCmdArgs &args ) {
 	int				i;
 
 	if ( args.Argc() > 1 ) {
-		idAnimator animator;
+		idAnimator tempAnimator;
 
 		classname = args.Argv( 1 );
 
@@ -1378,12 +1378,12 @@ static void Cmd_ListAnims_f( const idCmdArgs &args ) {
 			gameLocal.Printf( "Entitydef '%s' not found\n", classname );
 			return;
 		}
-		animator.SetModel( dict->GetString( "model" ) );
+		tempAnimator.SetModel( dict->GetString( "model" ) );
 
 		gameLocal.Printf( "----------------\n" );
-		num = animator.NumAnims();
+		num = tempAnimator.NumAnims();
 		for( i = 0; i < num; i++ ) {
-			gameLocal.Printf( "%s\n", animator.AnimFullName( i ) );
+			gameLocal.Printf( "%s\n", tempAnimator.AnimFullName( i ) );
 		}
 		gameLocal.Printf( "%d anims\n", num );
 	} else {

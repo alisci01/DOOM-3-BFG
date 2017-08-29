@@ -542,10 +542,10 @@ void idSWF::RenderShape( idRenderSystem * gui, const idSWFShape * shape, const s
 			idSWFDictionaryEntry * entry = &dictionary[ fill.style.bitmapID ];
 			material = atlasMaterial;
 			idVec2i	atlasSize( material->GetImageWidth(), material->GetImageHeight() );
-			for ( int i = 0 ; i < 2 ; i++ ) {
-				size[i] = entry->imageSize[i];
-				atlasScale[i] = (float)size[i] / atlasSize[i];
-				atlasBias[i] = (float)entry->imageAtlasOffset[i] / atlasSize[i];
+			for ( int j = 0 ; j < 2 ; j++ ) {
+				size[j] = entry->imageSize[j];
+				atlasScale[j] = (float)size[j] / atlasSize[j];
+				atlasBias[j] = (float)entry->imageAtlasOffset[j] / atlasSize[j];
 			}
 			// de-normalize color channels after DXT decompression
 			color.mul = entry->channelScale;
@@ -1055,12 +1055,12 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 	idStr inputText;
 	if ( inputField ) {
 		if ( textLines.Num() > 0 ) {
-			idStr & text = textLines[0];
+			idStr & line = textLines[0];
 			float left = bounds.tl.x;
 
 			int startCheckIndex = textInstance->GetInputStartChar();
 
-			if ( startCheckIndex >= text.Length() ) {
+			if ( startCheckIndex >= line.Length() ) {
 				startCheckIndex = 0;
 			}
 
@@ -1069,9 +1069,9 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 			}
 
 			bool endFound = false;
-			int c = startCheckIndex;
-			while ( c < text.Length() ) {
-				uint32 tc = text.UTF8Char( c );
+			int checkNdx = startCheckIndex;
+			while ( checkNdx < line.Length() ) {
+				uint32 tc = line.UTF8Char( checkNdx );
 				scaledGlyphInfo_t glyph;
 				fontInfo->GetScaledGlyph( glyphScale, tc, glyph );
 				float glyphSkip = glyph.xSkip;
@@ -1080,12 +1080,12 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 				}
 
 				if ( left + glyphSkip > bounds.br.x ) {
-					if ( cursorPos > c && cursorPos != endCharacter ) {
+					if ( cursorPos > checkNdx && cursorPos != endCharacter ) {
 
 						float removeSize = 0.0f;
 
 						while ( removeSize < glyphSkip ) {
-							if ( endCharacter == c ) {
+							if ( endCharacter == checkNdx ) {
 								break;
 							}
 							scaledGlyphInfo_t removeGlyph;
@@ -1095,7 +1095,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 
 						left -= removeSize;
 					} else {
-						inputEndChar = c;
+						inputEndChar = checkNdx;
 						endFound = true;
 						break;
 					}
@@ -1105,7 +1105,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 			}
 
 			if ( !endFound ) {
-				inputEndChar = text.Length();
+				inputEndChar = line.Length();
 			}
 
 			startCheckIndex += endCharacter;
@@ -1121,11 +1121,11 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 		}
 		
 		if ( t < textLine ) {
-			idStr & text = textLines[t];
-			c += text.Length();
+			idStr & line = textLines[t];
+			c += line.Length();
 			startCharacter = endCharacter;
-			endCharacter = startCharacter + text.Length();
-			overallIndex += text.Length();
+			endCharacter = startCharacter + line.Length();
+			overallIndex += line.Length();
 
 			// find the right icon index if we scrolled passed the previous ones
 			for ( int iconChar = curIcon; iconChar < tooltipIconList.Num(); ++iconChar ) {
@@ -1145,8 +1145,8 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 
 		startCharacter = endCharacter;
 
-		idStr & text = textLines[textLine];
-		int lastChar = text.Length();
+		idStr & line = textLines[textLine];
+		int lastChar = line.Length();
 		if ( textInstance->IsSubtitle() ) {
 			lastChar = textInstance->GetSubEndIndex();
 		}
@@ -1162,7 +1162,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 			cursorPos -= startCharacter;
 			endCharacter = inputEndChar;
 			lastChar = endCharacter;
-			text = text.Mid( startCharacter, endCharacter - startCharacter );
+			line = line.Mid( startCharacter, endCharacter - startCharacter );
 		} else {
 
 			if ( lastChar == 0 ) {
@@ -1182,9 +1182,9 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 				i += tooltipIconList[curIcon].endIndex - tooltipIconList[curIcon].startIndex - 1;
 				curIcon++;
 			} else {
-				if ( i < text.Length() ) {
+				if ( i < line.Length() ) {
 					scaledGlyphInfo_t glyph;
-					fontInfo->GetScaledGlyph( glyphScale, text.UTF8Char( i ), glyph );
+					fontInfo->GetScaledGlyph( glyphScale, line.UTF8Char( i ), glyph );
 					width += glyph.xSkip;
 					if ( textInstance->HasStroke() ) {
 						width += ( swf_textStrokeSizeGlyphSpacer.GetFloat() * textInstance->GetStrokeWeight() * glyphScale );
@@ -1214,7 +1214,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 
 			int idx = 0;
 			scaledGlyphInfo_t glyph;
-			fontInfo->GetScaledGlyph( glyphScale, text.UTF8Char( idx ), glyph );
+			fontInfo->GetScaledGlyph( glyphScale, line.UTF8Char( idx ), glyph );
 
 			topSpace = ( ( biggestGlyphHeight * imageScale ) - glyph.height ) / 2.0f;
 
@@ -1278,19 +1278,19 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 		idVec4 textColor = defaultColor;
 		while ( i < lastChar ) {		
 
-			if ( i >= text.Length() ) {
+			if ( i >= line.Length() ) {
 				break;
 			}
 
 			// Support colors
 			if ( !textInstance->ignoreColor ) {
-				if ( text[ i ] == C_COLOR_ESCAPE ) {
-					if ( idStr::IsColor( text.c_str() + i++ ) ) {
-						if ( text[ i ] == C_COLOR_DEFAULT ) {
+				if ( line[ i ] == C_COLOR_ESCAPE ) {
+					if ( idStr::IsColor( line.c_str() + i++ ) ) {
+						if ( line[ i ] == C_COLOR_DEFAULT ) {
 							i++;
 							textColor = defaultColor;
 						} else {
-							textColor = idStr::ColorForIndex( text[ i++ ] );
+							textColor = idStr::ColorForIndex( line[ i++ ] );
 							textColor.w = defaultColor.w;
 						}
 						continue;
@@ -1298,7 +1298,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 				}
 			}
 
-			uint32 character = text.UTF8Char( i );
+			uint32 character = line.UTF8Char( i );
 
 			if ( character == '\n' ) {
 				c++;
@@ -1398,12 +1398,12 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 			float s2 = glyph.s2;
 			float t2 = glyph.t2;
 			if ( c > selStart && c <= selEnd ) {
-				idVec2 topl = matrix.Transform( idVec2( x, y ) );
-				idVec2 topr = matrix.Transform( idVec2( x + glyphSkip, y ) );
-				idVec2 br = matrix.Transform( idVec2( x + glyphSkip, y + linespacing ) );
-				idVec2 bl = matrix.Transform( idVec2( x, y + linespacing ) );
+				idVec2 topLeft = matrix.Transform( idVec2( x, y ) );
+				idVec2 topRight = matrix.Transform( idVec2( x + glyphSkip, y ) );
+				idVec2 botRight = matrix.Transform( idVec2( x + glyphSkip, y + linespacing ) );
+				idVec2 botLeft = matrix.Transform( idVec2( x, y + linespacing ) );
 				gui->SetColor( selColor );
-				DrawStretchPic( idVec4( topl.x, topl.y, 0, 0 ), idVec4( topr.x, topr.y, 1, 0 ), idVec4( br.x, br.y, 1, 1 ), idVec4( bl.x, bl.y, 0, 1 ), white );
+				DrawStretchPic( idVec4( topLeft.x, topLeft.y, 0, 0 ), idVec4( topRight.x, topRight.y, 1, 0 ), idVec4( botRight.x, botRight.y, 1, 1 ), idVec4( botLeft.x, botLeft.y, 0, 1 ), white );
 				gui->SetColor( textColor );
 			}
 
@@ -1427,9 +1427,9 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 				idVec4 strokeColor = colorBlack;
 				strokeColor.w = textInstance->GetStrokeStrength() * defaultColor.w;
 				gui->SetColor( strokeColor );
-				for ( int index = 0; index < 4; ++index ) {
-					float xPos = glyphX + ( ( strokeXOffsets[ index ] * textInstance->GetStrokeWeight() ) * glyphScale );
-					float yPos = glyphY + ( ( strokeYOffsets[ index ] * textInstance->GetStrokeWeight() ) * glyphScale );
+				for ( int strokeNdx = 0; strokeNdx < 4; ++strokeNdx ) {
+					float xPos = glyphX + ( ( strokeXOffsets[ strokeNdx ] * textInstance->GetStrokeWeight() ) * glyphScale );
+					float yPos = glyphY + ( ( strokeYOffsets[ strokeNdx ] * textInstance->GetStrokeWeight() ) * glyphScale );
 					idVec2 topLeft = matrix.Transform( idVec2( xPos, yPos ) );
 					idVec2 topRight = matrix.Transform( idVec2( xPos + glyphW, yPos ) );
 					idVec2 botRight = matrix.Transform( idVec2( xPos + glyphW, yPos + glyphH ) );
