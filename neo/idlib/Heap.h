@@ -37,6 +37,10 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
+// temp disable INLINE warnings
+#pragma warning( push )
+#pragma warning( disable: 4595 )
+
 // memory tag names are used to sort allocations for sys_dumpMemory and other reporting functions
 enum memTag_t {
 #define MEM_TAG( x )	TAG_##x,
@@ -1076,4 +1080,5 @@ void idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::CheckMemory(
 	}
 }
 
+#pragma warning( pop )
 #endif /* !__HEAP_H__ */
