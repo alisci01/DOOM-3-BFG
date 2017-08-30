@@ -600,10 +600,10 @@ void idGameLocal::ServerProcessReliableMessage( int clientNum, int type, const i
 
 			idVec3 targetLocation = victim.GetRenderEntity()->origin + victim.GetRenderEntity()->joints[location].ToVec3() * victim.GetRenderEntity()->axis;
 
-			trace_t tr;
-			gameLocal.clip.Translation( tr, muzzleOrigin, targetLocation, NULL, mat3_identity, MASK_SHOT_RENDERMODEL, &attacker );
+			trace_t trace;
+			gameLocal.clip.Translation( trace, muzzleOrigin, targetLocation, NULL, mat3_identity, MASK_SHOT_RENDERMODEL, &attacker );
 			
-			idEntity * hitEnt = gameLocal.entities[ tr.c.entityNum ];
+			idEntity * hitEnt = gameLocal.entities[ trace.c.entityNum ];
 			if ( hitEnt != &victim ) {
 				break;
 			}

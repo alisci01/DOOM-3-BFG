@@ -1489,7 +1489,7 @@ idActor::CanSee
 =====================
 */
 bool idActor::CanSee( idEntity *ent, bool useFov ) const {
-	trace_t		tr;
+	trace_t		trace;
 	idVec3		eye;
 	idVec3		toPos;
 
@@ -1509,8 +1509,8 @@ bool idActor::CanSee( idEntity *ent, bool useFov ) const {
 
 	eye = GetEyePosition();
 
-	gameLocal.clip.TracePoint( tr, eye, toPos, MASK_OPAQUE, this );
-	if ( tr.fraction >= 1.0f || ( gameLocal.GetTraceEntity( tr ) == ent ) ) {
+	gameLocal.clip.TracePoint( trace, eye, toPos, MASK_OPAQUE, this );
+	if ( trace.fraction >= 1.0f || ( gameLocal.GetTraceEntity( trace ) == ent ) ) {
 		return true;
 	}
 

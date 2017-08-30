@@ -1252,9 +1252,9 @@ void idWeapon::GetWeaponDef( const char *objectname, int ammoinclip ) {
 				args.Set("model", particle.c_str());
 				args.SetBool("start_off", true);
 
-				idEntity* ent;
-				gameLocal.SpawnEntityDef(args, &ent, false);
-				newParticle.emitter = (idFuncEmitter*)ent;
+				idEntity* spawnedEnt;
+				gameLocal.SpawnEntityDef(args, &spawnedEnt, false);
+				newParticle.emitter = (idFuncEmitter*)spawnedEnt;
 
 				if ( newParticle.emitter != NULL ) {
 					newParticle.emitter->BecomeActive(TH_THINK);
@@ -1281,8 +1281,8 @@ void idWeapon::GetWeaponDef( const char *objectname, int ammoinclip ) {
 			idStr jointName = weaponDef->dict.GetString(va("%s_joint", name.c_str()));
 			newLight.joint = animator.GetJointHandle(jointName.c_str());
 
-			idStr shader = weaponDef->dict.GetString(va("%s_shader", name.c_str()));
-			newLight.light.shader = declManager->FindMaterial( shader, false );
+			idStr shaderStr = weaponDef->dict.GetString(va("%s_shader", name.c_str()));
+			newLight.light.shader = declManager->FindMaterial( shaderStr, false );
 
 			float radius = weaponDef->dict.GetFloat(va("%s_radius", name.c_str()));
 			newLight.light.lightRadius[0] = newLight.light.lightRadius[1] = newLight.light.lightRadius[2] = radius;
@@ -1431,10 +1431,10 @@ void idWeapon::UpdateFlashPosition() {
 	// if the desired point is inside or very close to a wall, back it up until it is clear
 	idVec3	start = muzzleFlash.origin - playerViewAxis[0] * 16;
 	idVec3	end = muzzleFlash.origin + playerViewAxis[0] * 8;
-	trace_t	tr;
-	gameLocal.clip.TracePoint( tr, start, end, MASK_SHOT_RENDERMODEL, owner );
+	trace_t	trace;
+	gameLocal.clip.TracePoint( trace, start, end, MASK_SHOT_RENDERMODEL, owner );
 	// be at least 8 units away from a solid
-	muzzleFlash.origin = tr.endpos - playerViewAxis[0] * 8;
+	muzzleFlash.origin = trace.endpos - playerViewAxis[0] * 8;
 
 	muzzleFlash.noShadows = !g_weaponShadows.GetBool();
 
@@ -2217,42 +2217,42 @@ idWeapon::AlertMonsters
 ================
 */
 void idWeapon::AlertMonsters() {
-	trace_t	tr;
+	trace_t	trace;
 	idEntity *ent;
 	idVec3 end = muzzleFlash.origin + muzzleFlash.axis * muzzleFlash.target;
 
-	gameLocal.clip.TracePoint( tr, muzzleFlash.origin, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL | CONTENTS_FLASHLIGHT_TRIGGER, owner );
+	gameLocal.clip.TracePoint( trace, muzzleFlash.origin, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL | CONTENTS_FLASHLIGHT_TRIGGER, owner );
 	if ( g_debugWeapon.GetBool() ) {
 		gameRenderWorld->DebugLine( colorYellow, muzzleFlash.origin, end, 0 );
-		gameRenderWorld->DebugArrow( colorGreen, muzzleFlash.origin, tr.endpos, 2, 0 );
+		gameRenderWorld->DebugArrow( colorGreen, muzzleFlash.origin, trace.endpos, 2, 0 );
 	}
 
-	if ( tr.fraction < 1.0f ) {
-		ent = gameLocal.GetTraceEntity( tr );
+	if ( trace.fraction < 1.0f ) {
+		ent = gameLocal.GetTraceEntity( trace );
 		if ( ent->IsType( idAI::Type ) ) {
 			static_cast<idAI *>( ent )->TouchedByFlashlight( owner );
 		} else if ( ent->IsType( idTrigger::Type ) ) {
 			ent->Signal( SIG_TOUCH );
-			ent->ProcessEvent( &EV_Touch, owner, &tr );
+			ent->ProcessEvent( &EV_Touch, owner, &trace );
 		}
 	}
 
 	// jitter the trace to try to catch cases where a trace down the center doesn't hit the monster
 	end += muzzleFlash.axis * muzzleFlash.right * idMath::Sin16( MS2SEC( gameLocal.time ) * 31.34f );
 	end += muzzleFlash.axis * muzzleFlash.up * idMath::Sin16( MS2SEC( gameLocal.time ) * 12.17f );
-	gameLocal.clip.TracePoint( tr, muzzleFlash.origin, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL | CONTENTS_FLASHLIGHT_TRIGGER, owner );
+	gameLocal.clip.TracePoint( trace, muzzleFlash.origin, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL | CONTENTS_FLASHLIGHT_TRIGGER, owner );
 	if ( g_debugWeapon.GetBool() ) {
 		gameRenderWorld->DebugLine( colorYellow, muzzleFlash.origin, end, 0 );
-		gameRenderWorld->DebugArrow( colorGreen, muzzleFlash.origin, tr.endpos, 2, 0 );
+		gameRenderWorld->DebugArrow( colorGreen, muzzleFlash.origin, trace.endpos, 2, 0 );
 	}
 
-	if ( tr.fraction < 1.0f ) {
-		ent = gameLocal.GetTraceEntity( tr );
+	if ( trace.fraction < 1.0f ) {
+		ent = gameLocal.GetTraceEntity( trace );
 		if ( ent->IsType( idAI::Type ) ) {
 			static_cast<idAI *>( ent )->TouchedByFlashlight( owner );
 		} else if ( ent->IsType( idTrigger::Type ) ) {
 			ent->Signal( SIG_TOUCH );
-			ent->ProcessEvent( &EV_Touch, owner, &tr );
+			ent->ProcessEvent( &EV_Touch, owner, &trace );
 		}
 	}
 }
@@ -3525,7 +3525,7 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 	float			ang;
 	float			spin;
 	float			distance;
-	trace_t			tr;
+	trace_t			trace;
 	idVec3			start;
 	idVec3			muzzle_pos;
 	idBounds		ownerBounds, projBounds;
@@ -3669,8 +3669,8 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 				} else {
 					start = ownerBounds.GetCenter();
 				}
-				gameLocal.clip.Translation( tr, start, muzzle_pos, proj->GetPhysics()->GetClipModel(), proj->GetPhysics()->GetClipModel()->GetAxis(), MASK_SHOT_RENDERMODEL, owner );
-				muzzle_pos = tr.endpos;
+				gameLocal.clip.Translation( trace, start, muzzle_pos, proj->GetPhysics()->GetClipModel(), proj->GetPhysics()->GetClipModel()->GetAxis(), MASK_SHOT_RENDERMODEL, owner );
+				muzzle_pos = trace.endpos;
 			}
 
 			// If this is the server simulating a remote client, the client has spawned the projectile in the past.
@@ -3727,7 +3727,7 @@ void idWeapon::Event_LaunchProjectilesEllipse( int num_projectiles, float spread
 	float			anga, angb;
 	float			spin;
 	float			distance;
-	trace_t			tr;
+	trace_t			trace;
 	idVec3			start;
 	idVec3			muzzle_pos;
 	idBounds		ownerBounds, projBounds;
@@ -3830,8 +3830,8 @@ void idWeapon::Event_LaunchProjectilesEllipse( int num_projectiles, float spread
 				else {
 					start = ownerBounds.GetCenter();
 				}
-				gameLocal.clip.Translation( tr, start, muzzle_pos, proj->GetPhysics()->GetClipModel(), proj->GetPhysics()->GetClipModel()->GetAxis(), MASK_SHOT_RENDERMODEL, owner );
-				muzzle_pos = tr.endpos;
+				gameLocal.clip.Translation( trace, start, muzzle_pos, proj->GetPhysics()->GetClipModel(), proj->GetPhysics()->GetClipModel()->GetAxis(), MASK_SHOT_RENDERMODEL, owner );
+				muzzle_pos = trace.endpos;
 			}
 
 			proj->Launch( muzzle_pos, dir, pushVelocity, fuseOffset, power );
@@ -3966,7 +3966,7 @@ idWeapon::Event_Melee
 */
 void idWeapon::Event_Melee() {
 	idEntity	*ent;
-	trace_t		tr;
+	trace_t		trace;
 
 	if ( weaponDef == NULL ) {
 		gameLocal.Error( "No weaponDef on '%s'", this->GetName() );
@@ -3981,9 +3981,9 @@ void idWeapon::Event_Melee() {
 	if ( !common->IsClient() ) {
 		idVec3 start = playerViewOrigin;
 		idVec3 end = start + playerViewAxis[0] * ( meleeDistance * owner->PowerUpModifier( MELEE_DISTANCE ) );
-		gameLocal.clip.TracePoint( tr, start, end, MASK_SHOT_RENDERMODEL, owner );
-		if ( tr.fraction < 1.0f ) {
-			ent = gameLocal.GetTraceEntity( tr );
+		gameLocal.clip.TracePoint( trace, start, end, MASK_SHOT_RENDERMODEL, owner );
+		if ( trace.fraction < 1.0f ) {
+			ent = gameLocal.GetTraceEntity( trace );
 		} else {
 			ent = NULL;
 		}
@@ -4001,14 +4001,14 @@ void idWeapon::Event_Melee() {
 		if ( ent != NULL ) {
 
 			float push = meleeDef->dict.GetFloat( "push" );
-			idVec3 impulse = -push * owner->PowerUpModifier( SPEED ) * tr.c.normal;
+			idVec3 impulse = -push * owner->PowerUpModifier( SPEED ) * trace.c.normal;
 
 			if ( gameLocal.world->spawnArgs.GetBool( "no_Weapons" ) && ( ent->IsType( idActor::Type ) || ent->IsType( idAFAttachment::Type) ) ) {
 				idThread::ReturnInt( 0 );
 				return;
 			}
 
-			ent->ApplyImpulse( this, tr.c.id, tr.c.point, impulse );
+			ent->ApplyImpulse( this, trace.c.id, trace.c.point, impulse );
 
 			// weapon stealing - do this before damaging so weapons are not dropped twice
 			if ( common->IsMultiplayer()
@@ -4033,7 +4033,7 @@ void idWeapon::Event_Melee() {
 					//Only do a quater of the damage mod
 					mod *= 0.25f;
 				}
-				ent->Damage( owner, owner, globalKickDir, meleeDefName, mod, tr.c.id );
+				ent->Damage( owner, owner, globalKickDir, meleeDefName, mod, trace.c.id );
 				hit = true;
 			}
 
@@ -4043,11 +4043,11 @@ void idWeapon::Event_Melee() {
 
 					hitSound = meleeDef->dict.GetString( owner->PowerUpActive( BERSERK ) ? "snd_hit_berserk" : "snd_hit" );
 
-					ent->AddDamageEffect( tr, impulse, meleeDef->dict.GetString( "classname" ) );
+					ent->AddDamageEffect( trace, impulse, meleeDef->dict.GetString( "classname" ) );
 
 				} else {
 
-					int type = tr.c.material->GetSurfaceType();
+					int type = trace.c.material->GetSurfaceType();
 					if ( type == SURFTYPE_NONE ) {
 						type = GetDefaultSurfaceType();
 					}
@@ -4065,7 +4065,7 @@ void idWeapon::Event_Melee() {
 						// project decal
 						decal = weaponDef->dict.GetString( "mtr_strike" );
 						if ( decal != NULL && *decal != NULL ) {
-							gameLocal.ProjectDecal( tr.c.point, -tr.c.normal, 8.0f, true, 6.0, decal );
+							gameLocal.ProjectDecal( trace.c.point, -trace.c.normal, 8.0f, true, 6.0, decal );
 						}
 						nextStrikeFx = gameLocal.time + 200;
 					} else {
@@ -4073,8 +4073,8 @@ void idWeapon::Event_Melee() {
 					}
 
 					strikeSmokeStartTime = gameLocal.time;
-					strikePos = tr.c.point;
-					strikeAxis = -tr.endAxis;
+					strikePos = trace.c.point;
+					strikeAxis = -trace.endAxis;
 				}
 			}
 		}

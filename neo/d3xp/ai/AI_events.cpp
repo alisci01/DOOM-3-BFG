@@ -625,7 +625,7 @@ idAI::Event_LaunchMissile
 */
 void idAI::Event_LaunchMissile( const idVec3 &org, const idAngles &ang ) {
 	idVec3		start;
-	trace_t		tr;
+	trace_t		trace;
 	idBounds	projBounds;
 	const idClipModel *projClip;
 	idMat3		axis;
@@ -661,14 +661,14 @@ void idAI::Event_LaunchMissile( const idVec3 &org, const idAngles &ang ) {
 		start = ownerBounds.GetCenter();
 	}
 
-	gameLocal.clip.Translation( tr, start, org, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
+	gameLocal.clip.Translation( trace, start, org, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
 
 	// launch the projectile
 	idThread::ReturnEntity( projectile.GetEntity() );
-	projectile.GetEntity()->Launch( tr.endpos, axis[ 0 ], vec3_origin );
+	projectile.GetEntity()->Launch( trace.endpos, axis[ 0 ], vec3_origin );
 	projectile = NULL;
 
-	TriggerWeaponEffects( tr.endpos );
+	TriggerWeaponEffects( trace.endpos );
 
 	lastAttackTime = gameLocal.time;
 }
@@ -685,7 +685,7 @@ void idAI::Event_LaunchProjectile( const char *entityDefName ) {
 	idMat3				axis;
 	const idClipModel	*projClip;
 	idBounds			projBounds;
-	trace_t				tr;
+	trace_t				trace;
 	idEntity			*ent;
 	const char			*clsname;
 	float				distance;
@@ -718,8 +718,8 @@ void idAI::Event_LaunchProjectile( const char *entityDefName ) {
 	} else {
 		start = ownerBounds.GetCenter();
 	}
-	gameLocal.clip.Translation( tr, start, muzzle, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
-	muzzle = tr.endpos;
+	gameLocal.clip.Translation( trace, start, muzzle, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
+	muzzle = trace.endpos;
 
 	GetAimDir( muzzle, enemy.GetEntity(), this, dir );
 
@@ -1544,7 +1544,7 @@ idAI::Event_CanHitEnemy
 =====================
 */
 void idAI::Event_CanHitEnemy() {
-	trace_t	tr;
+	trace_t	trace;
 	idEntity *hit;
 
 	idActor *enemyEnt = enemy.GetEntity();
@@ -1569,11 +1569,11 @@ void idAI::Event_CanHitEnemy() {
 	dir = toPos - eye;
 	dir.Normalize();
 	toPos = eye + dir * MAX_WORLD_SIZE;
-	gameLocal.clip.TracePoint( tr, eye, toPos, MASK_SHOT_BOUNDINGBOX, this );
-	hit = gameLocal.GetTraceEntity( tr );
-	if ( tr.fraction >= 1.0f || ( hit == enemyEnt ) ) {
+	gameLocal.clip.TracePoint( trace, eye, toPos, MASK_SHOT_BOUNDINGBOX, this );
+	hit = gameLocal.GetTraceEntity( trace );
+	if ( trace.fraction >= 1.0f || ( hit == enemyEnt ) ) {
 		lastHitCheckResult = true;
-	} else if ( ( tr.fraction < 1.0f ) && ( hit->IsType( idAI::Type ) ) && 
+	} else if ( ( trace.fraction < 1.0f ) && ( hit->IsType( idAI::Type ) ) && 
 		( static_cast<idAI *>( hit )->team != team ) ) {
 		lastHitCheckResult = true;
 	} else {
@@ -1595,7 +1595,7 @@ void idAI::Event_CanHitEnemyFromAnim( const char *animname ) {
 	idVec3	fromPos;
 	idMat3	axis;
 	idVec3	start;
-	trace_t	tr;
+	trace_t	trace;
 	float	distance;
 
 	idActor *enemyEnt = enemy.GetEntity();
@@ -1645,8 +1645,8 @@ void idAI::Event_CanHitEnemyFromAnim( const char *animname ) {
 		start = ownerBounds.GetCenter();
 	}
 
-	gameLocal.clip.Translation( tr, start, fromPos, projectileClipModel, mat3_identity, MASK_SHOT_RENDERMODEL, this );
-	fromPos = tr.endpos;
+	gameLocal.clip.Translation( trace, start, fromPos, projectileClipModel, mat3_identity, MASK_SHOT_RENDERMODEL, this );
+	fromPos = trace.endpos;
 
 	if ( GetAimDir( fromPos, enemy.GetEntity(), this, dir ) ) {
 		idThread::ReturnInt( true );
@@ -1661,7 +1661,7 @@ idAI::Event_CanHitEnemyFromJoint
 =====================
 */
 void idAI::Event_CanHitEnemyFromJoint( const char *jointname ) {
-	trace_t	tr;
+	trace_t	trace;
 	idVec3	muzzle;
 	idMat3	axis;
 	idVec3	start;
@@ -1710,11 +1710,11 @@ void idAI::Event_CanHitEnemyFromJoint( const char *jointname ) {
 		start = ownerBounds.GetCenter();
 	}
 
-	gameLocal.clip.Translation( tr, start, muzzle, projectileClipModel, mat3_identity, MASK_SHOT_BOUNDINGBOX, this );
-	muzzle = tr.endpos;
+	gameLocal.clip.Translation( trace, start, muzzle, projectileClipModel, mat3_identity, MASK_SHOT_BOUNDINGBOX, this );
+	muzzle = trace.endpos;
 
-	gameLocal.clip.Translation( tr, muzzle, toPos, projectileClipModel, mat3_identity, MASK_SHOT_BOUNDINGBOX, this );
-	if ( tr.fraction >= 1.0f || ( gameLocal.GetTraceEntity( tr ) == enemyEnt ) ) {
+	gameLocal.clip.Translation( trace, muzzle, toPos, projectileClipModel, mat3_identity, MASK_SHOT_BOUNDINGBOX, this );
+	if ( trace.fraction >= 1.0f || ( gameLocal.GetTraceEntity( trace ) == enemyEnt ) ) {
 		lastHitCheckResult = true;
 	} else {
 		lastHitCheckResult = false;
@@ -2904,7 +2904,7 @@ idAI::Event_LaunchHomingMissile
 */
 void idAI::Event_LaunchHomingMissile() {
 	idVec3		start;
-	trace_t		tr;
+	trace_t		trace;
 	idBounds	projBounds;
 	const idClipModel *projClip;
 	idMat3		axis;
@@ -2955,7 +2955,7 @@ void idAI::Event_LaunchHomingMissile() {
 		start = ownerBounds.GetCenter();
 	}
 
-	gameLocal.clip.Translation( tr, start, org, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
+	gameLocal.clip.Translation( trace, start, org, projClip, projClip->GetAxis(), MASK_SHOT_RENDERMODEL, this );
 
 	// launch the projectile
 	idThread::ReturnEntity( projectile.GetEntity() );
@@ -2965,7 +2965,7 @@ void idAI::Event_LaunchHomingMissile() {
 	projectile.GetEntity()->Launch( org, ang.ToForward(), vec3_origin );
 	projectile = NULL;
 
-	TriggerWeaponEffects( tr.endpos );
+	TriggerWeaponEffects( trace.endpos );
 
 	lastAttackTime = gameLocal.time;
 }

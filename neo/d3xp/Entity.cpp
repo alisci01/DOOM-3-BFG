@@ -3142,7 +3142,7 @@ explosions and melee attacks.
 */
 bool idEntity::CanDamage( const idVec3 &origin, idVec3 &damagePoint ) const {
 	idVec3 	dest;
-	trace_t	tr;
+	trace_t	trace;
 	idVec3 	midpoint;
 
 	// use the midpoint of the bounds instead of the origin, because
@@ -3150,9 +3150,9 @@ bool idEntity::CanDamage( const idVec3 &origin, idVec3 &damagePoint ) const {
 	midpoint = ( GetPhysics()->GetAbsBounds()[0] + GetPhysics()->GetAbsBounds()[1] ) * 0.5;
 
 	dest = midpoint;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
@@ -3160,52 +3160,52 @@ bool idEntity::CanDamage( const idVec3 &origin, idVec3 &damagePoint ) const {
 	dest = midpoint;
 	dest[0] += 15.0;
 	dest[1] += 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
 	dest = midpoint;
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
 	dest = midpoint;
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
 	dest = midpoint;
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
 	dest = midpoint;
 	dest[2] += 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
 	dest = midpoint;
 	dest[2] -= 15.0;
-	gameLocal.clip.TracePoint( tr, origin, dest, MASK_SOLID, NULL );
-	if ( tr.fraction == 1.0 || ( gameLocal.GetTraceEntity( tr ) == this ) ) {
-		damagePoint = tr.endpos;
+	gameLocal.clip.TracePoint( trace, origin, dest, MASK_SOLID, NULL );
+	if ( trace.fraction == 1.0 || ( gameLocal.GetTraceEntity( trace ) == this ) ) {
+		damagePoint = trace.endpos;
 		return true;
 	}
 
@@ -3653,11 +3653,11 @@ bool idEntity::HandleGuiCommands( idEntity *entityGui, const char *cmds ) {
 			if ( token.Icmp( "runScript" ) == 0 ) {
 				if ( src.ReadToken( &token2 ) ) {
 					while( src.CheckTokenString( "::" ) ) {
-						idToken token3;
-						if ( !src.ReadToken( &token3 ) ) {
+						idToken funcNameToken;
+						if ( !src.ReadToken( &funcNameToken ) ) {
 							gameLocal.Error( "Expecting function name following '::' in gui for entity '%s'", entityGui->name.c_str() );
 						}
-						token2 += "::" + token3;
+						token2 += "::" + funcNameToken;
 					}
 					const function_t *func = gameLocal.program.FindFunction( token2 );
 					if ( !func ) {

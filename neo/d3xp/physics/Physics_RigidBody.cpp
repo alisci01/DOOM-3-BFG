@@ -359,7 +359,7 @@ idPhysics_RigidBody::DropToFloorAndRest
 */
 void idPhysics_RigidBody::DropToFloorAndRest() {
 	idVec3 down;
-	trace_t tr;
+	trace_t trace;
 
 	if ( testSolid ) {
 
@@ -376,12 +376,12 @@ void idPhysics_RigidBody::DropToFloorAndRest() {
 
 	// put the body on the floor
 	down = current.i.position + gravityNormal * 128.0f;
-	gameLocal.clip.Translation( tr, current.i.position, down, clipModel, current.i.orientation, clipMask, self );
-	current.i.position = tr.endpos;
-	clipModel->Link( gameLocal.clip, self, clipModel->GetId(), tr.endpos, current.i.orientation );
+	gameLocal.clip.Translation( trace, current.i.position, down, clipModel, current.i.orientation, clipMask, self );
+	current.i.position = trace.endpos;
+	clipModel->Link( gameLocal.clip, self, clipModel->GetId(), trace.endpos, current.i.orientation );
 
 	// if on the floor already
-	if ( tr.fraction == 0.0f ) {
+	if ( trace.fraction == 0.0f ) {
 		// test if we are really at rest
 		EvaluateContacts();
 		if ( !TestIfAtRest() ) {

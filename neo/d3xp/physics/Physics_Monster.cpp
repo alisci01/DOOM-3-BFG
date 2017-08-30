@@ -89,31 +89,31 @@ idPhysics_Monster::SlideMove
 */
 monsterMoveResult_t idPhysics_Monster::SlideMove( idVec3 &start, idVec3 &velocity, const idVec3 &delta ) {
 	int i;
-	trace_t tr;
+	trace_t trace;
 	idVec3 move;
 
 	blockingEntity = NULL;
 	move = delta;
 	for( i = 0; i < 3; i++ ) {
-		gameLocal.clip.Translation( tr, start, start + move, clipModel, clipModel->GetAxis(), clipMask, self );
+		gameLocal.clip.Translation( trace, start, start + move, clipModel, clipModel->GetAxis(), clipMask, self );
 
-		start = tr.endpos;
+		start = trace.endpos;
 
-		if ( tr.fraction == 1.0f ) {
+		if ( trace.fraction == 1.0f ) {
 			if ( i > 0 ) {
 				return MM_SLIDING;
 			}
 			return MM_OK;
 		}
 
-		if ( tr.c.entityNum != ENTITYNUM_NONE ) {
-			assert( tr.c.entityNum < MAX_GENTITIES );
-			blockingEntity = gameLocal.entities[ tr.c.entityNum ];
+		if ( trace.c.entityNum != ENTITYNUM_NONE ) {
+			assert( trace.c.entityNum < MAX_GENTITIES );
+			blockingEntity = gameLocal.entities[ trace.c.entityNum ];
 		} 
 		
 		// clip the movement delta and velocity
-		move.ProjectOntoPlane( tr.c.normal, OVERCLIP );
-		velocity.ProjectOntoPlane( tr.c.normal, OVERCLIP );
+		move.ProjectOntoPlane( trace.c.normal, OVERCLIP );
+		velocity.ProjectOntoPlane( trace.c.normal, OVERCLIP );
 	}
 
 	return MM_BLOCKED;
@@ -128,7 +128,7 @@ idPhysics_Monster::StepMove
 =====================
 */
 monsterMoveResult_t idPhysics_Monster::StepMove( idVec3 &start, idVec3 &velocity, const idVec3 &delta ) {
-	trace_t tr;
+	trace_t trace;
 	idVec3 up, down, noStepPos, noStepVel, stepPos, stepVel;
 	monsterMoveResult_t result1, result2;
 	float	stepdist;
@@ -151,9 +151,9 @@ monsterMoveResult_t idPhysics_Monster::StepMove( idVec3 &start, idVec3 &velocity
 
 		// try to step down so that we walk down slopes and stairs at a normal rate
 		down = noStepPos + gravityNormal * maxStepHeight;
-		gameLocal.clip.Translation( tr, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-		if ( tr.fraction < 1.0f ) {
-			start = tr.endpos;
+		gameLocal.clip.Translation( trace, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
+		if ( trace.fraction < 1.0f ) {
+			start = trace.endpos;
 			return MM_STEPPED;
 		} else {
 			start = noStepPos;
@@ -164,8 +164,8 @@ monsterMoveResult_t idPhysics_Monster::StepMove( idVec3 &start, idVec3 &velocity
 	if ( blockingEntity && blockingEntity->IsType( idActor::Type ) ) {
 		// try to step down in case walking into an actor while going down steps
 		down = noStepPos + gravityNormal * maxStepHeight;
-		gameLocal.clip.Translation( tr, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-		start = tr.endpos;
+		gameLocal.clip.Translation( trace, noStepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
+		start = trace.endpos;
 		velocity = noStepVel;
 		return MM_BLOCKED;
 	}
@@ -176,15 +176,15 @@ monsterMoveResult_t idPhysics_Monster::StepMove( idVec3 &start, idVec3 &velocity
 
 	// try to step up
 	up = start - gravityNormal * maxStepHeight;
-	gameLocal.clip.Translation( tr, start, up, clipModel, clipModel->GetAxis(), clipMask, self );
-	if ( tr.fraction == 0.0f ) {
+	gameLocal.clip.Translation( trace, start, up, clipModel, clipModel->GetAxis(), clipMask, self );
+	if ( trace.fraction == 0.0f ) {
 		start = noStepPos;
 		velocity = noStepVel;
 		return result1;
 	}
 
 	// try to move at the stepped up position
-	stepPos = tr.endpos;
+	stepPos = trace.endpos;
 	stepVel = velocity;
 	result2 = SlideMove( stepPos, stepVel, delta );
 	if ( result2 == MM_BLOCKED ) {
@@ -195,13 +195,13 @@ monsterMoveResult_t idPhysics_Monster::StepMove( idVec3 &start, idVec3 &velocity
 
 	// step down again
 	down = stepPos + gravityNormal * maxStepHeight;
-	gameLocal.clip.Translation( tr, stepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
-	stepPos = tr.endpos;
+	gameLocal.clip.Translation( trace, stepPos, down, clipModel, clipModel->GetAxis(), clipMask, self );
+	stepPos = trace.endpos;
 
 	// if the move is further without stepping up, or the slope is too steap, don't step up
 	nostepdist = ( noStepPos - start ).LengthSqr();
 	stepdist = ( stepPos - start ).LengthSqr();
-	if ( ( nostepdist >= stepdist ) || ( ( tr.c.normal * -gravityNormal ) < minFloorCosine ) ) {
+	if ( ( nostepdist >= stepdist ) || ( ( trace.c.normal * -gravityNormal ) < minFloorCosine ) ) {
 		start = noStepPos;
 		velocity = noStepVel;
 		return MM_SLIDING;

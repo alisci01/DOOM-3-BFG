@@ -214,11 +214,11 @@ idEntity* idAimAssist::FindAimAssistTarget( idVec3& targetPos ) {
 		if ( computedScore > currentBestScore ) {
 
 			// determine if the current target is in our line of sight
-			trace_t tr;
-			gameLocal.clip.TracePoint( tr, cameraPos, primaryTargetPos, MASK_MONSTERSOLID, player );
+			trace_t tr1;
+			gameLocal.clip.TracePoint( tr1, cameraPos, primaryTargetPos, MASK_MONSTERSOLID, player );
 		
 			// did our trace fail?
-			if ( ( ( tr.fraction < 1.0f ) && ( tr.c.entityNum != entity->entityNumber ) ) || ( tr.fraction >= 1.0f ) ) {
+			if ( ( ( tr1.fraction < 1.0f ) && ( tr1.c.entityNum != entity->entityNumber ) ) || ( tr1.fraction >= 1.0f ) ) {
 
 				// if the collision test failed for the primary position -- check the secondary position
 				trace_t tr2;

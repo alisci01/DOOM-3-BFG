@@ -721,11 +721,11 @@ bool idAF::LoadConstraint( const idDeclAF_Constraint *fc ) {
 			c->SetFriction( fc->friction );
 			switch( fc->limit ) {
 				case idDeclAF_Constraint::LIMIT_CONE: {
-					idVec3 left, up, axis, shaft;
+					idVec3 left, up, limitAxis, shaft;
 					fc->axis.ToVec3().OrthogonalBasis( left, up );
-					axis = left * idRotation( vec3_origin, fc->axis.ToVec3(), fc->limitAngles[0] );
+					limitAxis = left * idRotation( vec3_origin, fc->axis.ToVec3(), fc->limitAngles[0] );
 					shaft = left * idRotation( vec3_origin, fc->axis.ToVec3(), fc->limitAngles[2] );
-					c->SetLimit( axis, fc->limitAngles[1], shaft );
+					c->SetLimit( limitAxis, fc->limitAngles[1], shaft );
 					break;
 				}
 				default: {

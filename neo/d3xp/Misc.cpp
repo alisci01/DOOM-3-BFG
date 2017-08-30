@@ -3307,7 +3307,7 @@ void idPhantomObjects::Think() {
 	idEntity	*ent;
 	idActor		*targetEnt;
 	idPhysics	*entPhys;
-	trace_t		tr;
+	trace_t		trace;
 
 	// if we are completely closed off from the player, don't do anything at all
 	if ( CheckDormant() ) {
@@ -3354,8 +3354,8 @@ void idPhantomObjects::Think() {
 		entPhys = ent->GetPhysics();
 		const idVec3 &entOrg = entPhys->GetOrigin();
 
-		gameLocal.clip.TracePoint( tr, entOrg, toPos, MASK_OPAQUE, ent );
-		if ( tr.fraction >= 1.0f || ( gameLocal.GetTraceEntity( tr ) == targetEnt ) ) {
+		gameLocal.clip.TracePoint( trace, entOrg, toPos, MASK_OPAQUE, ent );
+		if ( trace.fraction >= 1.0f || ( gameLocal.GetTraceEntity( trace ) == targetEnt ) ) {
 			lastTargetPos[ i ] = toPos;
 		}
 
