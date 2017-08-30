@@ -285,7 +285,8 @@ ID_INLINE idQuat& idQuat::Normalize() {
 
 ID_INLINE float idQuat::CalcW() const {
 	// take the absolute value because floating point rounding may cause the dot of x,y,z to be larger than 1
-	return sqrt( fabs( 1.0f - ( x * x + y * y + z * z ) ) );
+	//TODO use sqrtf and fabsf instead of static casting?
+	return static_cast<float>( sqrt( fabs( 1.0f - ( x * x + y * y + z * z ) ) ) );
 }
 
 ID_INLINE int idQuat::GetDimension() const {
@@ -407,7 +408,8 @@ ID_INLINE int idCQuat::GetDimension() const {
 
 ID_INLINE idQuat idCQuat::ToQuat() const {
 	// take the absolute value because floating point rounding may cause the dot of x,y,z to be larger than 1
-	return idQuat( x, y, z, sqrt( fabs( 1.0f - ( x * x + y * y + z * z ) ) ) );
+	//TODO use sqrtf and fabsf instead of static cast?
+	return idQuat( x, y, z, static_cast<float>( sqrt( fabs( 1.0f - ( x * x + y * y + z * z ) ) ) ) );
 }
 
 ID_INLINE const float *idCQuat::ToFloatPtr() const {
