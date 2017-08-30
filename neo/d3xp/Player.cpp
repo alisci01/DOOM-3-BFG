@@ -2050,7 +2050,6 @@ idPlayer::Save
 ===========
 */
 void idPlayer::Save( idSaveGame *savefile ) const {
-	int i;
 
 	savefile->WriteUsercmd( usercmd );
 	playerView.Save( savefile );
@@ -2150,7 +2149,7 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	savefile->WriteStaticObject( physicsObj );
 
 	savefile->WriteInt( aasLocation.Num() );
-	for( i = 0; i < aasLocation.Num(); i++ ) {
+	for( int i = 0; i < aasLocation.Num(); i++ ) {
 		savefile->WriteInt( aasLocation[ i ].areaNum );
 		savefile->WriteVec3( aasLocation[ i ].pos );
 	}
@@ -2213,10 +2212,10 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 
 	savefile->WriteObject( privateCameraView );
 
-	for( i = 0; i < NUM_LOGGED_VIEW_ANGLES; i++ ) {
+	for( int i = 0; i < NUM_LOGGED_VIEW_ANGLES; i++ ) {
 		savefile->WriteAngles( loggedViewAngles[ i ] );
 	}
-	for( i = 0; i < NUM_LOGGED_ACCELS; i++ ) {
+	for( int i = 0; i < NUM_LOGGED_ACCELS; i++ ) {
 		savefile->WriteInt( loggedAccel[ i ].time );
 		savefile->WriteVec3( loggedAccel[ i ].dir );
 	}
@@ -2258,7 +2257,7 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	//}
 
 	savefile->WriteInt(weaponToggles.Num());
-	for(i = 0; i < weaponToggles.Num(); i++) {
+	for( int i = 0; i < weaponToggles.Num(); i++ ) {
 		WeaponToggle_t* weaponToggle = weaponToggles.GetIndex(i);
 		savefile->WriteString(weaponToggle->name);
 		savefile->WriteInt(weaponToggle->toggleList.Num());
@@ -2306,7 +2305,6 @@ idPlayer::Restore
 ===========
 */
 void idPlayer::Restore( idRestoreGame *savefile ) {
-	int	  i;
 	int	  num;
 	float set;
 
@@ -2352,7 +2350,7 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 		pdaMenu->Initialize( "pda", common->SW() );
 	}
 
-	for ( i = 0; i < inventory.emails.Num(); i++ ) {
+	for ( int i = 0; i < inventory.emails.Num(); i++ ) {
 		GetPDA()->AddEmail( inventory.emails[i] );
 	}
 
@@ -2439,7 +2437,7 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt( num );
 	aasLocation.SetGranularity( 1 );
 	aasLocation.SetNum( num );
-	for( i = 0; i < num; i++ ) {
+	for( int i = 0; i < num; i++ ) {
 		savefile->ReadInt( aasLocation[ i ].areaNum );
 		savefile->ReadVec3( aasLocation[ i ].pos );
 	}
@@ -2514,10 +2512,10 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 
 	savefile->ReadObject( reinterpret_cast<idClass *&>( privateCameraView ) );
 
-	for( i = 0; i < NUM_LOGGED_VIEW_ANGLES; i++ ) {
+	for( int i = 0; i < NUM_LOGGED_VIEW_ANGLES; i++ ) {
 		savefile->ReadAngles( loggedViewAngles[ i ] );
 	}
-	for( i = 0; i < NUM_LOGGED_ACCELS; i++ ) {
+	for( int i = 0; i < NUM_LOGGED_ACCELS; i++ ) {
 		savefile->ReadInt( loggedAccel[ i ].time );
 		savefile->ReadVec3( loggedAccel[ i ].dir );
 	}
@@ -2567,7 +2565,7 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 
 	int weaponToggleCount;
 	savefile->ReadInt(weaponToggleCount);
-	for(i = 0; i < weaponToggleCount; i++) {
+	for( int i = 0; i < weaponToggleCount; i++ ) {
 		WeaponToggle_t newToggle;
 		memset(&newToggle, 0, sizeof(newToggle));
 
@@ -4110,8 +4108,8 @@ bool idPlayer::GiveInventoryItem( idDict * item, unsigned int giveFlags ) {
 		//Reset the powercell count
 		int powerCellCount = 0;
 		for ( int j = 0; j < inventory.items.Num(); j++ ) {
-			idDict *item = inventory.items[ j ];
-			if(item->GetInt("inv_powercell")) {
+			idDict *invItem = inventory.items[ j ];
+			if(invItem->GetInt("inv_powercell")) {
 				powerCellCount++;
 			}
 		}
@@ -4371,8 +4369,8 @@ void idPlayer::RemoveInventoryItem( idDict *item ) {
 		//Reset the powercell count
 		int powerCellCount = 0;
 		for ( int j = 0; j < inventory.items.Num(); j++ ) {
-			idDict *item = inventory.items[ j ];
-			if(item->GetInt("inv_powercell")) {
+			idDict *invItem = inventory.items[ j ];
+			if(invItem->GetInt("inv_powercell")) {
 				powerCellCount++;
 			}
 		}
@@ -5557,8 +5555,8 @@ void idPlayer::UpdateFocus() {
 
 	// player identification -> names to the hud
 	if ( common->IsMultiplayer() && IsLocallyControlled() ) {
-		idVec3 end = start + viewAngles.ToForward() * 768.0f;
-		gameLocal.clip.TracePoint( trace, start, end, MASK_SHOT_BOUNDINGBOX, this );
+		idVec3 traceEnd = start + viewAngles.ToForward() * 768.0f;
+		gameLocal.clip.TracePoint( trace, start, traceEnd, MASK_SHOT_BOUNDINGBOX, this );
 		int iclient = -1;
 		if ( ( trace.fraction < 1.0f ) && ( trace.c.entityNum < MAX_CLIENTS ) ) {
 			iclient = trace.c.entityNum;
@@ -8466,10 +8464,10 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 			attackerPushScale = 1.0f;
 		}
 
-		idVec3 kick = dir;
-		kick.Normalize();
-		kick *= g_knockback.GetFloat() * knockback * attackerPushScale / 200.0f;
-		physicsObj.SetLinearVelocity( physicsObj.GetLinearVelocity() + kick );
+		idVec3 kickDir = dir;
+		kickDir.Normalize();
+		kickDir *= g_knockback.GetFloat() * knockback * attackerPushScale / 200.0f;
+		physicsObj.SetLinearVelocity( physicsObj.GetLinearVelocity() + kickDir );
 
 		// set the timer so that the player can't cancel out the movement immediately
 		physicsObj.SetKnockBack( idMath::ClampInt( 50, 200, knockback * 2 ) );	

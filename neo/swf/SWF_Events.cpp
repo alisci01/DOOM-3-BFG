@@ -137,32 +137,32 @@ idSWFScriptObject * idSWF::HitTest( idSWFSpriteInstance * spriteInstance, const 
 			idVec3 br; 
 			idVec3 bl;
 
-			float xOffset = spriteInstance->xOffset;
-			float yOffset = spriteInstance->yOffset;
+			float spriteXOffset = spriteInstance->xOffset;
+			float spriteYOffset = spriteInstance->yOffset;
 
 			float topOffset = 0.0f;
 
 			if ( text->align == SWF_ET_ALIGN_LEFT ) {
-				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x  + xOffset, shape->bounds.tl.y + topOffset + yOffset ) ); 
-				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x - lengthDiff + xOffset, shape->bounds.tl.y + topOffset + yOffset ) ); 
-				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x - lengthDiff + xOffset, shape->bounds.br.y + topOffset + yOffset ) ); 
-				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + xOffset, shape->bounds.br.y + topOffset + yOffset ) );									
+				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x  + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) ); 
+				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x - lengthDiff + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) ); 
+				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x - lengthDiff + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) ); 
+				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) );									
 			} else if ( text->align == SWF_ET_ALIGN_RIGHT ) {
-				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + lengthDiff + xOffset, shape->bounds.tl.y + topOffset + yOffset ) );
-				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + xOffset, shape->bounds.tl.y + topOffset + yOffset ) );
-				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + xOffset, shape->bounds.br.y + topOffset + yOffset ) );
-				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + lengthDiff + xOffset, shape->bounds.br.y + topOffset + yOffset ) );				
+				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + lengthDiff + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) );
+				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + lengthDiff + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) );				
 			} else if ( text->align == SWF_ET_ALIGN_CENTER ) {
-				float middle = ( ( shape->bounds.br.x + xOffset ) + ( shape->bounds.tl.x + xOffset ) ) / 2.0f;
-				tl.ToVec2() = renderState2.matrix.Transform( idVec2( middle - ( textLength / 2.0f ), shape->bounds.tl.y + topOffset + yOffset ) );
-				tr.ToVec2() = renderState2.matrix.Transform( idVec2( middle + ( textLength / 2.0f ), shape->bounds.tl.y + topOffset + yOffset ) );
-				br.ToVec2() = renderState2.matrix.Transform( idVec2( middle + ( textLength / 2.0f ), shape->bounds.br.y + topOffset + yOffset ) );
-				bl.ToVec2() = renderState2.matrix.Transform( idVec2( middle - ( textLength / 2.0f ), shape->bounds.br.y + topOffset + yOffset ) );				
+				float middle = ( ( shape->bounds.br.x + spriteXOffset ) + ( shape->bounds.tl.x + spriteXOffset ) ) / 2.0f;
+				tl.ToVec2() = renderState2.matrix.Transform( idVec2( middle - ( textLength / 2.0f ), shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				tr.ToVec2() = renderState2.matrix.Transform( idVec2( middle + ( textLength / 2.0f ), shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				br.ToVec2() = renderState2.matrix.Transform( idVec2( middle + ( textLength / 2.0f ), shape->bounds.br.y + topOffset + spriteYOffset ) );
+				bl.ToVec2() = renderState2.matrix.Transform( idVec2( middle - ( textLength / 2.0f ), shape->bounds.br.y + topOffset + spriteYOffset ) );				
 			} else {
-				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + xOffset, shape->bounds.tl.y + topOffset + yOffset ) );
-				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + xOffset, shape->bounds.tl.y + topOffset + yOffset ) );
-				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + xOffset, shape->bounds.br.y + topOffset + yOffset ) );
-				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + xOffset, shape->bounds.br.y + topOffset + yOffset ) );
+				tl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				tr.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + spriteXOffset, shape->bounds.tl.y + topOffset + spriteYOffset ) );
+				br.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.br.x + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) );
+				bl.ToVec2() = renderState2.matrix.Transform( idVec2( shape->bounds.tl.x + spriteXOffset, shape->bounds.br.y + topOffset + spriteYOffset ) );
 			}
 
 			tl.z = 1.0f;
