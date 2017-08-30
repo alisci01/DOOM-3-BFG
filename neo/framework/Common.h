@@ -86,7 +86,14 @@ public:
 	~idScopedProfileEvent() { EndProfileNamedEvent(); }
 };
 
-#define SCOPED_PROFILE_EVENT( x ) idScopedProfileEvent scopedProfileEvent_##__LINE__( x )
+//TODO move this into sys defines?
+#define PASTER( x, y ) x ## _ ## y
+#define EVALUATOR( x, y ) PASTER( x, y )
+
+// equivalent to idScopedProfileEvent scopedProfileEvent_##__LINE__( x ), but we need two levels of indirection
+//	in order to make it work like we expect it to
+// see: https://stackoverflow.com/questions/1489932/how-to-concatenate-twice-with-the-c-preprocessor-and-expand-a-macro-as-in-arg
+#define SCOPED_PROFILE_EVENT( x ) idScopedProfileEvent EVALUATOR( scopedProfileEvent, __LINE__ )( x )
 
 ID_INLINE bool BeginTraceRecording( char * szName ) {
 	return false;
