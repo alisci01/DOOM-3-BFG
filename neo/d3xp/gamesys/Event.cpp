@@ -283,36 +283,36 @@ idEvent *idEvent::Alloc( const idEventDef *evdef, int numargs, va_list args ) {
 		switch( format[ i ] ) {
 		case D_EVENT_FLOAT :
 		case D_EVENT_INTEGER :
-			*reinterpret_cast<int *>( dataPtr ) = arg->value;
+			*reinterpret_cast<int *>( dataPtr ) = arg->value.intVal;
 			break;
 
 		case D_EVENT_VECTOR :
-			if ( arg->value ) {
-				*reinterpret_cast<idVec3 *>( dataPtr ) = *reinterpret_cast<const idVec3 *>( arg->value );
+			if ( arg->value.vec ) {
+				*reinterpret_cast<idVec3 *>( dataPtr ) = *arg->value.vec;
 			}
 			break;
 
 		case D_EVENT_STRING :
-			if ( arg->value ) {
-				idStr::Copynz( reinterpret_cast<char *>( dataPtr ), reinterpret_cast<const char *>( arg->value ), MAX_STRING_LEN );
+			if ( arg->value.strVal ) {
+				idStr::Copynz( reinterpret_cast<char *>( dataPtr ), arg->value.strVal, MAX_STRING_LEN );
 			}
 			break;
 
 		case D_EVENT_ENTITY :
 		case D_EVENT_ENTITY_NULL :
-			*reinterpret_cast< idEntityPtr<idEntity> * >( dataPtr ) = reinterpret_cast<idEntity *>( arg->value );
+			*reinterpret_cast< idEntityPtr<idEntity> * >( dataPtr ) = arg->value.entity;
 			break;
 
 		case D_EVENT_TRACE :
-			if ( arg->value ) {
+			if ( arg->value.trace ) {
 				*reinterpret_cast<bool *>( dataPtr ) = true;
-				*reinterpret_cast<trace_t *>( dataPtr + sizeof( bool ) ) = *reinterpret_cast<const trace_t *>( arg->value );
+				*reinterpret_cast<trace_t *>( dataPtr + sizeof( bool ) ) = *arg->value.trace;
 
 				// save off the material as a string since the pointer won't be valid in save games.
 				// since we save off the entire trace_t structure, if the material is NULL here,
 				// it will be NULL when we process it, so we don't need to save off anything in that case.
-				if ( reinterpret_cast<const trace_t *>( arg->value )->c.material ) {
-					materialName = reinterpret_cast<const trace_t *>( arg->value )->c.material->GetName();
+				if ( arg->value.trace->c.material ) {
+					materialName = arg->value.trace->c.material->GetName();
 					idStr::Copynz( reinterpret_cast<char *>( dataPtr + sizeof( bool ) + sizeof( trace_t ) ), materialName, MAX_STRING_LEN );
 				}
 			} else {
@@ -334,7 +334,7 @@ idEvent *idEvent::Alloc( const idEventDef *evdef, int numargs, va_list args ) {
 idEvent::CopyArgs
 ================
 */
-void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, int data[ D_EVENT_MAXARGS ] ) {
+void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, void *data[ D_EVENT_MAXARGS ] ) {
 	int			i;
 	const char	*format;
 	idEventArg	*arg;
@@ -353,7 +353,7 @@ void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, int 
 			}
 		}
 
-		data[ i ] = arg->value;
+		data[ i ] = arg->value.vptr;
 	}
 }
 

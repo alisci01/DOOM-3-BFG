@@ -57,16 +57,24 @@ struct idEventFunc {
 class idEventArg {
 public:
 	int			type;
-	int			value;
+	union {
+		int						intVal;
+		float					floatVal;
+		const idVec3*			vec;
+		const char*				strVal;
+		const class idEntity*	entity;
+		const struct trace_s*	trace;
+		void*					vptr;
+	}			value;
 
-	idEventArg()								{ type = D_EVENT_INTEGER; value = 0; };
-	idEventArg( int data )						{ type = D_EVENT_INTEGER; value = data; };
-	idEventArg( float data )					{ type = D_EVENT_FLOAT; value = *reinterpret_cast<int *>( &data ); };
-	idEventArg( idVec3 &data )					{ type = D_EVENT_VECTOR; value = reinterpret_cast<int>( &data ); };
-	idEventArg( const idStr &data )				{ type = D_EVENT_STRING; value = reinterpret_cast<int>( data.c_str() ); };
-	idEventArg( const char *data )				{ type = D_EVENT_STRING; value = reinterpret_cast<int>( data ); };
-	idEventArg( const class idEntity *data )	{ type = D_EVENT_ENTITY; value = reinterpret_cast<int>( data ); };
-	idEventArg( const struct trace_s *data )	{ type = D_EVENT_TRACE; value = reinterpret_cast<int>( data ); };
+	idEventArg()								{ type = D_EVENT_INTEGER;	value.vptr = nullptr; };
+	idEventArg( int data )						{ type = D_EVENT_INTEGER;	value.intVal = data; };
+	idEventArg( float data )					{ type = D_EVENT_FLOAT;		value.floatVal = data; };
+	idEventArg( idVec3 &data )					{ type = D_EVENT_VECTOR;	value.vec = &data; };
+	idEventArg( const idStr &data )				{ type = D_EVENT_STRING;	value.strVal = data.c_str(); };
+	idEventArg( const char *data )				{ type = D_EVENT_STRING;	value.strVal = data; };
+	idEventArg( const class idEntity *data )	{ type = D_EVENT_ENTITY;	value.entity = data; };
+	idEventArg( const struct trace_s *data )	{ type = D_EVENT_TRACE;		value.trace = data; };
 };
 
 class idAllocError : public idException {
@@ -222,7 +230,7 @@ public:
 	bool						ProcessEvent( const idEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7 );
 	bool						ProcessEvent( const idEventDef *ev, idEventArg arg1, idEventArg arg2, idEventArg arg3, idEventArg arg4, idEventArg arg5, idEventArg arg6, idEventArg arg7, idEventArg arg8 );
 
-	bool						ProcessEventArgPtr( const idEventDef *ev, int *data );
+	bool						ProcessEventArgPtr( const idEventDef *ev, void **data );
 	void						CancelEvents( const idEventDef *ev );
 
 	void						Event_Remove();
