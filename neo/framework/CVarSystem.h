@@ -79,6 +79,14 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
+class idCVar;
+
+#ifdef ID_X64
+#define STATIC_VARS_REGISTERED reinterpret_cast<idCVar *>( 0xFFFFFFFFFFFFFFFF )
+#else	// ID_X64
+#define STATIC_VARS_REGISTERED reinterpret_cast<idCVar *>( 0xFFFFFFFF )
+#endif	// !ID_X64
+
 typedef enum {
 	CVAR_ALL				= -1,		// all flags
 	CVAR_BOOL				= BIT(0),	// variable is a boolean
@@ -291,7 +299,7 @@ ID_INLINE void idCVar::Init( const char *name, const char *value, int flags, con
 	this->integerValue = 0;
 	this->floatValue = 0.0f;
 	this->internalVar = this;
-	if ( staticVars != (idCVar *)0xFFFFFFFF ) {
+	if ( staticVars != STATIC_VARS_REGISTERED ) {
 		this->next = staticVars;
 		staticVars = this;
 	} else {
@@ -300,12 +308,14 @@ ID_INLINE void idCVar::Init( const char *name, const char *value, int flags, con
 }
 
 ID_INLINE void idCVar::RegisterStaticVars() {
-	if ( staticVars != (idCVar *)0xFFFFFFFF ) {
+	if ( staticVars != STATIC_VARS_REGISTERED ) {
 		for ( idCVar *cvar = staticVars; cvar; cvar = cvar->next ) {
 			cvarSystem->Register( cvar );
 		}
-		staticVars = (idCVar *)0xFFFFFFFF;
+		staticVars = STATIC_VARS_REGISTERED;
 	}
 }
+
+#undef STATIC_VARS_REGISTERED
 
 #endif /* !__CVARSYSTEM_H__ */

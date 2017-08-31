@@ -213,4 +213,11 @@ extern volatile int ignoredReturnValue;
 #define MAX_UNSIGNED_TYPE( x )	( ( ( ( 1U << ( ( sizeof( x ) - 1 ) * 8 ) ) - 1 ) << 8 ) | 255U )
 #define MIN_UNSIGNED_TYPE( x )	0
 
+//TODO stick these in property sheets?
+#if defined(_WIN64)
+#define ID_X64
+#else
+#define ID_X32
+#endif
+
 #endif
