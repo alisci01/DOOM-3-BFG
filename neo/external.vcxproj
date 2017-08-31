@@ -162,7 +162,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="_Common.props" />
+    <Import Project="_Common_x64.props" />
     <Import Project="_external.props" />
     <Import Project="_Debug.props" />
   </ImportGroup>
@@ -174,7 +174,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="_Common.props" />
+    <Import Project="_Common_x64.props" />
     <Import Project="_external.props" />
     <Import Project="_Release.props" />
   </ImportGroup>
@@ -186,7 +186,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="_Common.props" />
+    <Import Project="_Common_x64.props" />
     <Import Project="_external.props" />
     <Import Project="_Release.props" />
   </ImportGroup>
