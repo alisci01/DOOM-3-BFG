@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 //===============================================================
 
 float	idMatX::temp[MATX_MAX_TEMP+4];
-float *	idMatX::tempPtr = (float *) ( ( (int) idMatX::temp + 15 ) & ~15 );
+float *	idMatX::tempPtr = reinterpret_cast<float *>( ( reinterpret_cast<ID_PTR_SIZE_TYPE>( idMatX::temp ) + 0xF ) & ~0xF );
 int		idMatX::tempIndex = 0;
 
 
