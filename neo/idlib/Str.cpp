@@ -29,6 +29,11 @@ If you have questions concerning this license or the applicable additional terms
 #include "precompiled.h"
 #pragma hdrstop
 
+#ifdef ID_X64
+//TODO convert alloc sizes and stuff to size_t for proper 64bit support
+#define strlen istrlen
+#endif // ID_X64
+
 #ifdef USE_STRING_DATA_ALLOCATOR
 static idDynamicBlockAlloc<char, 1<<18, 128, TAG_STRING>	stringDataAllocator;
 #endif
@@ -157,7 +162,7 @@ void idStr::operator=( const char *text ) {
 	if ( text >= data && text <= data + len ) {
 		diff = text - data;
 
-		assert( strlen( text ) < (unsigned)len );
+		assert( static_cast<uint>( strlen( text ) ) < static_cast<uint>( len ) );
 
 		for ( i = 0; text[ i ]; i++ ) {
 			data[ i ] = text[ i ];
@@ -1254,7 +1259,7 @@ int idStr::Cmp( const char *s1, const char *s2 ) {
 idStr::Cmpn
 ================
 */
-int idStr::Cmpn( const char *s1, const char *s2, int n ) {
+int idStr::Cmpn( const char *s1, const char *s2, size_t n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1314,7 +1319,7 @@ int idStr::Icmp( const char *s1, const char *s2 ) {
 idStr::Icmpn
 ================
 */
-int idStr::Icmpn( const char *s1, const char *s2, int n ) {
+int idStr::Icmpn( const char *s1, const char *s2, size_t n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1461,7 +1466,7 @@ int idStr::IcmpPath( const char *s1, const char *s2 ) {
 idStr::IcmpnPath
 ================
 */
-int idStr::IcmpnPath( const char *s1, const char *s2, int n ) {
+int idStr::IcmpnPath( const char *s1, const char *s2, size_t n ) {
 	int c1, c2, d;
 
 #if 0
@@ -1538,7 +1543,7 @@ idStr::Copynz
 Safe strncpy that ensures a trailing zero
 =============
 */
-void idStr::Copynz( char *dest, const char *src, int destsize ) {
+void idStr::Copynz( char *dest, const char *src, size_t destsize ) {
 	if ( !src ) {
 		idLib::common->Warning( "idStr::Copynz: NULL src" );
 		return;

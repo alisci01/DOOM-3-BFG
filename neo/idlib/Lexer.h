@@ -143,7 +143,7 @@ public:
 					idLexer();
 					idLexer( int flags );
 					idLexer( const char *filename, int flags = 0, bool OSPath = false );
-					idLexer( const char *ptr, int length, const char *name, int flags = 0 );
+					idLexer( const char *ptr, size_t length, const char *name, int flags = 0 );
 					// destructor
 					~idLexer();
 					// load a script from the given file at the given offset with the given length
@@ -151,7 +151,7 @@ public:
 					// load a script from the given memory with the given length and a specified line offset,
 					// so source strings extracted from a file can still refer to proper line numbers in the file
 					// NOTE: the ptr is expected to point at a valid C string: ptr[length] == '\0'
-	int				LoadMemory( const char *ptr, int length, const char *name, int startLine = 1 );
+	bool			LoadMemory( const char *ptr, size_t length, const char *name, size_t startLine = 1 );
 					// free the script
 	void			FreeSource();
 					// returns true if a script is loaded
@@ -234,7 +234,7 @@ public:
 					// get file time
 	const ID_TIME_T	GetFileTime();
 					// returns the current line number
-	const int		GetLineNum();
+	const size_t	GetLineNum();
 					// print an error message
 	void			Error( VERIFY_FORMAT_STRING const char *str, ... );
 					// print a warning message
@@ -255,10 +255,10 @@ private:
 	const char *	lastScript_p;			// script pointer before reading token
 	const char *	whiteSpaceStart_p;		// start of last white space
 	const char *	whiteSpaceEnd_p;		// end of last white space
-	ID_TIME_T			fileTime;				// file time
-	int				length;					// length of the script in bytes
-	int				line;					// current line in script
-	int				lastline;				// line before reading token
+	ID_TIME_T		fileTime;				// file time
+	size_t			length;					// length of the script in bytes
+	size_t			line;					// current line in script
+	size_t			lastline;				// line before reading token
 	int				tokenavailable;			// set by unreadToken
 	int				flags;					// several script flags
 	const punctuation_t *punctuations;		// the punctuations used in the script
@@ -280,7 +280,7 @@ private:
 	int				ReadPunctuation( idToken *token );
 	int				ReadPrimitive( idToken *token );
 	int				CheckString( const char *str ) const;
-	int				NumLinesCrossed();
+	size_t			NumLinesCrossed();
 };
 
 ID_INLINE const char *idLexer::GetFileName() {
@@ -295,7 +295,7 @@ ID_INLINE const ID_TIME_T idLexer::GetFileTime() {
 	return idLexer::fileTime;
 }
 
-ID_INLINE const int idLexer::GetLineNum() {
+ID_INLINE const size_t idLexer::GetLineNum() {
 	return idLexer::line;
 }
 

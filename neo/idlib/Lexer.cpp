@@ -519,7 +519,7 @@ Reads two strings with only a white space between them as one string.
 ================
 */
 int idLexer::ReadString( idToken *token, int quote ) {
-	int tmpline;
+	size_t tmpline;
 	const char *tmpscript_p;
 	char ch;
 
@@ -1700,7 +1700,8 @@ bool idLexer::EndOfFile() {
 idLexer::NumLinesCrossed
 ================
 */
-int idLexer::NumLinesCrossed() {
+size_t idLexer::NumLinesCrossed()
+{
 	return idLexer::line - idLexer::lastline;
 }
 
@@ -1712,7 +1713,7 @@ idLexer::LoadFile
 int idLexer::LoadFile( const char *filename, bool OSPath ) {
 	idFile *fp;
 	idStr pathname;
-	int length;
+	size_t length;
 	char *buf;
 
 	if ( idLexer::loaded ) {
@@ -1764,7 +1765,7 @@ int idLexer::LoadFile( const char *filename, bool OSPath ) {
 idLexer::LoadMemory
 ================
 */
-int idLexer::LoadMemory( const char *ptr, int length, const char *name, int startLine ) {
+bool idLexer::LoadMemory( const char *ptr, size_t length, const char *name, size_t startLine /*= 1 */ ) {
 	if ( idLexer::loaded ) {
 		idLib::common->Error("idLexer::LoadMemory: another script already loaded");
 		return false;
@@ -1878,7 +1879,7 @@ idLexer::idLexer( const char *filename, int flags, bool OSPath ) {
 idLexer::idLexer
 ================
 */
-idLexer::idLexer( const char *ptr, int length, const char *name, int flags ) {
+idLexer::idLexer( const char *ptr, size_t length, const char *name, int flags ) {
 	idLexer::loaded = false;
 	idLexer::flags = flags;
 	idLexer::SetPunctuations( NULL );

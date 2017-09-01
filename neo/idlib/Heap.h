@@ -53,10 +53,10 @@ static const int MAX_TAGS = 256;
 
 
 
-void *		Mem_Alloc16( const int size, const memTag_t tag );
+void *		Mem_Alloc16( const size_t size, const memTag_t tag );
 void		Mem_Free16( void *ptr );
 
-ID_INLINE void *	Mem_Alloc( const int size, const memTag_t tag ) { return Mem_Alloc16( size, tag ); }
+ID_INLINE void *	Mem_Alloc( const size_t size, const memTag_t tag ) { return Mem_Alloc16( size, tag ); }
 ID_INLINE void		Mem_Free( void *ptr ) { Mem_Free16( ptr ); }
 
 void *		Mem_ClearedAlloc( const int size, const memTag_t tag );
@@ -107,24 +107,24 @@ template < class T >
 class idTempArray {
 public:
 	idTempArray( idTempArray<T> & other );
-	idTempArray( unsigned int num );
+	idTempArray( size_t num );
 
 	~idTempArray();
 
-	T & operator []( unsigned int i ) { assert( i < num ); return buffer[i]; }
-	const T & operator []( unsigned int i ) const { assert( i < num ); return buffer[i]; }
+	T & operator []( size_t i ) { assert( i < num ); return buffer[i]; }
+	const T & operator []( size_t i ) const { assert( i < num ); return buffer[i]; }
 
 	T * Ptr() { return buffer; }
 	const T* Ptr() const { return buffer; }
 
 	size_t Size( ) const { return num * sizeof( T ); }
-	unsigned int Num( ) const { return num; }
+	size_t Num( ) const { return num; }
 
 	void Zero() { memset( Ptr(), 0, Size() ); }
 
 private:
 	T *				buffer;		// Ensure this buffer comes first, so this == &this->buffer
-	unsigned int	num;
+	size_t			num;
 };
 
 /*
@@ -146,7 +146,7 @@ idTempArray::idTempArray
 ========================
 */
 template < class T >
-ID_INLINE idTempArray<T>::idTempArray( unsigned int num ) {
+ID_INLINE idTempArray<T>::idTempArray( size_t num ) {
 	this->num = num;
 	buffer = (T*)Mem_Alloc( num * sizeof( T ), TAG_TEMP );
 }

@@ -718,10 +718,11 @@ int idParser::ExpandBuiltinDefine( idToken *deftoken, define_t *define, idToken 
 	token = new (TAG_IDLIB_PARSER) idToken(deftoken);
 	switch( define->builtin ) {
 		case BUILTIN_LINE: {
-			sprintf( buf, "%d", deftoken->line );
+			sprintf( buf, "%zu", deftoken->line );
 			(*token) = buf;
-			token->intvalue = deftoken->line;
-			token->floatvalue = deftoken->line;
+			//TODO verify this is a safe conversion
+			token->intvalue = static_cast<unsigned long>( deftoken->line );
+			token->floatvalue = static_cast<double>( deftoken->line );
 			token->type = TT_NUMBER;
 			token->subtype = TT_DECIMAL | TT_INTEGER | TT_VALUESVALID;
 			token->line = deftoken->line;
@@ -3070,11 +3071,11 @@ int idParser::LoadFile( const char *filename, bool OSPath ) {
 idParser::LoadMemory
 ================
 */
-int idParser::LoadMemory(const char *ptr, int length, const char *name ) {
+bool idParser::LoadMemory(const char *ptr, size_t length, const char *name ) {
 	idLexer *script;
 
 	if ( idParser::loaded ) {
-		idLib::common->FatalError("idParser::loadMemory: another source already loaded");
+		idLib::common->FatalError( "idParser::loadMemory: another source already loaded" );
 		return false;
 	}
 	script = new (TAG_IDLIB_PARSER) idLexer( ptr, length, name );
@@ -3251,7 +3252,7 @@ idParser::idParser( const char *filename, int flags, bool OSPath ) {
 idParser::idParser
 ================
 */
-idParser::idParser( const char *ptr, int length, const char *name, int flags ) {
+idParser::idParser( const char *ptr, size_t length, const char *name, int flags ) {
 	this->loaded = false;
 	this->OSPath = false;
 	this->punctuations = 0;

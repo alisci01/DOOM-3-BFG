@@ -484,7 +484,7 @@ WriteString
 ================
 */
 static void WriteString( const char *s, idFile *f ) {
-	int	len = strlen( s );
+	size_t len = strlen( s );
 	if ( len >= MAX_STRING_CHARS-1 ) {
 		idLib::common->Error( "idDict::WriteToFileHandle: bad string" );
 	}
@@ -570,7 +570,7 @@ idDict::MatchPrefix
 */
 const idKeyValue *idDict::MatchPrefix( const char *prefix, const idKeyValue *lastMatch ) const {
 	int	i;
-	int len;
+	size_t len;
 	int start;
 
 	assert( prefix );
@@ -766,7 +766,7 @@ idDict::ReadFromIniFile
 ================
 */
 bool idDict::ReadFromIniFile( idFile * f ) {
-	int length = f->Length();
+	size_t length = f->Length();
 	idTempArray< char > buffer( length );
 	if ( (int)f->Read( buffer.Ptr(), length ) != length ) {
 		return false;

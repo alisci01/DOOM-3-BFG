@@ -83,7 +83,7 @@ returns the minimum size in bytes of the target buffer for decoding
 4 base64 digits <-> 3 bytes
 ============
 */
-int idBase64::DecodeLength( void ) const {
+size_t idBase64::DecodeLength() const {
 	return 3*len/4;
 }
 
@@ -92,7 +92,7 @@ int idBase64::DecodeLength( void ) const {
 idBase64::Decode
 ============
 */
-int idBase64::Decode( byte *to ) const {
+size_t idBase64::Decode( byte *to ) const {
 	unsigned long w;
 	int i, j;
 	size_t n;
@@ -150,7 +150,7 @@ idBase64::Decode
 */
 void idBase64::Decode( idStr &dest ) const {
 	byte *buf = new (TAG_IDLIB) byte[ DecodeLength()+1 ]; // +1 for trailing \0
-	int out = Decode( buf );
+	size_t out = Decode( buf );
 	buf[out] = '\0';
 	dest = (const char *)buf;
 	delete[] buf;
@@ -163,7 +163,7 @@ idBase64::Decode
 */
 void idBase64::Decode( idFile *dest ) const {	
 	byte *buf = new (TAG_IDLIB) byte[ DecodeLength()+1 ]; // +1 for trailing \0
-	int out = Decode( buf );
+	size_t out = Decode( buf );
 	dest->Write( buf, out );
 	delete[] buf;
 }

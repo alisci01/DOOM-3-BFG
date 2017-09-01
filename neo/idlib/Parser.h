@@ -80,14 +80,14 @@ public:
 					idParser();
 					idParser( int flags );
 					idParser( const char *filename, int flags = 0, bool OSPath = false );
-					idParser( const char *ptr, int length, const char *name, int flags = 0 );
+					idParser( const char *ptr, size_t length, const char *name, int flags = 0 );
 					// destructor
 					~idParser();
 					// load a source file
 	int				LoadFile( const char *filename, bool OSPath = false );
 					// load a source from the given memory with the given length
 					// NOTE: the ptr is expected to point at a valid C string: ptr[length] == '\0'
-	int				LoadMemory( const char *ptr, int length, const char *name );
+	bool			LoadMemory( const char *ptr, size_t length, const char *name );
 					// free the current source
 	void			FreeSource( bool keepDefines = false );
 					// returns true if a source is loaded
@@ -163,7 +163,7 @@ public:
 					// get file time for current script
 	const ID_TIME_T	GetFileTime() const;
 					// returns the current line number
-	const int		GetLineNum() const;
+	const size_t	GetLineNum() const;
 					// print an error message
 	void			Error( VERIFY_FORMAT_STRING const char *str, ... ) const;
 					// print a warning message
@@ -272,7 +272,8 @@ ID_INLINE const ID_TIME_T idParser::GetFileTime() const {
 	}
 }
 
-ID_INLINE const int idParser::GetLineNum() const {
+const size_t idParser::GetLineNum() const
+{
 	if ( idParser::scriptstack ) {
 		return idParser::scriptstack->GetLineNum();
 	}

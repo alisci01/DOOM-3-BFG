@@ -76,8 +76,8 @@ class idToken : public idStr {
 public:
 	int				type;								// token type
 	int				subtype;							// token sub type
-	int				line;								// line in script the token was on
-	int				linesCrossed;						// number of lines crossed in white space before token
+	size_t			line;								// line in script the token was on
+	size_t			linesCrossed;						// number of lines crossed in white space before token
 	int				flags;								// token flags, used for recursive defines
 
 public:

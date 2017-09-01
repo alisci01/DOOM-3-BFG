@@ -179,6 +179,7 @@ void PrintClocks( char *string, int dataCount, int clocks, int otherClocks = 0 )
 	}
 }
 
+#ifdef ID_X32
 /*
 ============
 GetBaseClocks
@@ -1207,6 +1208,7 @@ void TestMath() {
 	}
 	PrintClocks( "     idAngles::ToMat3()", 1, bestClocks );
 }
+#endif // ID_X32
 
 /*
 ============
@@ -1242,6 +1244,7 @@ void idSIMD::Test_f( const idCmdArgs &args ) {
 
 	idLib::common->Printf( "using %s for SIMD processing\n", p_simd->GetName() );
 
+#ifdef ID_X32
 	GetBaseClocks();
 
 	TestMath();
@@ -1257,6 +1260,7 @@ void idSIMD::Test_f( const idCmdArgs &args ) {
 	TestConvertJointMatsToJointQuats();
 	TestTransformJoints();
 	TestUntransformJoints();
+#endif
 
 	idLib::common->Printf("====================================\n" );
 

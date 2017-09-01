@@ -45,8 +45,8 @@ public:
 
 	void		Encode( const byte *from, int size );
 	void		Encode( const idStr &src );
-	int			DecodeLength() const; // minimum size in bytes of destination buffer for decoding
-	int			Decode( byte *to ) const; // does not append a \0 - needs a DecodeLength() bytes buffer
+	size_t		DecodeLength() const; // minimum size in bytes of destination buffer for decoding
+	size_t		Decode( byte *to ) const; // does not append a \0 - needs a DecodeLength() bytes buffer
 	void		Decode( idStr &dest ) const; // decodes the binary content to an idStr (a bit dodgy, \0 and other non-ascii are possible in the decoded content)
 	void		Decode( idFile *dest ) const;
 
