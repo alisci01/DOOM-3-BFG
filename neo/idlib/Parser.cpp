@@ -936,9 +936,8 @@ line only if a backslash '\' is found
 ================
 */
 int idParser::ReadLine( idToken *token ) {
-	int crossline;
 
-	crossline = 0;
+	size_t crossline = 0;
 	do {
 		if (!idParser::ReadSourceToken( token )) {
 			return false;
@@ -2679,7 +2678,8 @@ brace depths are properly skipped.
 */
 const char* idParser::ParseBracedSection( idStr& out, int tabs, bool parseFirstBrace, char intro, char outro ) {
 	idToken token;
-	int i, depth;
+	size_t i;
+	int depth;
 	bool doTabs;
 
 	char temp[ 2 ] = { 0, 0 };

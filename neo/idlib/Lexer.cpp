@@ -1535,7 +1535,7 @@ Internal brace depths are properly skipped.
 */
 const char *idLexer::ParseBracedSection( idStr &out ) {
 	idToken token;
-	int i, depth;
+	int depth;
 
 	out.Empty();
 	if ( !idLexer::ExpectTokenString( "{" ) ) {
@@ -1550,7 +1550,7 @@ const char *idLexer::ParseBracedSection( idStr &out ) {
 		}
 
 		// if the token is on a new line
-		for ( i = 0; i < token.linesCrossed; i++ ) {
+		for ( size_t i = 0; i < token.linesCrossed; i++ ) {
 			out += "\r\n";
 		}
 
