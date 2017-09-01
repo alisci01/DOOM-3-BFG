@@ -59,7 +59,7 @@ void		Mem_Free16( void *ptr );
 ID_INLINE void *	Mem_Alloc( const size_t size, const memTag_t tag ) { return Mem_Alloc16( size, tag ); }
 ID_INLINE void		Mem_Free( void *ptr ) { Mem_Free16( ptr ); }
 
-void *		Mem_ClearedAlloc( const int size, const memTag_t tag );
+void *		Mem_ClearedAlloc( const size_t size, const memTag_t tag );
 char *		Mem_CopyString( const char *in );
 
 ID_INLINE void *operator new( size_t s ) {
@@ -590,8 +590,8 @@ public:
 	void							SetLockMemory( bool lock );
 	void							FreeEmptyBaseBlocks();
 
-	type *							Alloc( const int num );
-	type *							Resize( type *ptr, const int num );
+	type *							Alloc( const size_t num );
+	type *							Resize( type *ptr, const size_t num );
 	void							Free( type *ptr );
 	const char *					CheckMemory( const type *ptr ) const;
 
@@ -614,22 +614,22 @@ private:
 	int								blockId[3];
 #endif
 
-	int								numBaseBlocks;			// number of base blocks
-	int								baseBlockMemory;		// total memory in base blocks
-	int								numUsedBlocks;			// number of used blocks
-	int								usedBlockMemory;		// total memory in used blocks
-	int								numFreeBlocks;			// number of free blocks
-	int								freeBlockMemory;		// total memory in free blocks
+	size_t							numBaseBlocks;			// number of base blocks
+	size_t							baseBlockMemory;		// total memory in base blocks
+	size_t							numUsedBlocks;			// number of used blocks
+	size_t							usedBlockMemory;		// total memory in used blocks
+	size_t							numFreeBlocks;			// number of free blocks
+	size_t							freeBlockMemory;		// total memory in free blocks
 
-	int								numAllocs;
-	int								numResizes;
-	int								numFrees;
+	size_t							numAllocs;
+	size_t							numResizes;
+	size_t							numFrees;
 	
 	memTag_t						tag;
 
 	void							Clear();
-	idDynamicBlock<type> *			AllocInternal( const int num );
-	idDynamicBlock<type> *			ResizeInternal( idDynamicBlock<type> *block, const int num );
+	idDynamicBlock<type> *			AllocInternal( const size_t num );
+	idDynamicBlock<type> *			ResizeInternal( idDynamicBlock<type> *block, const size_t num );
 	void							FreeInternal( idDynamicBlock<type> *block );
 	void							LinkFreeInternal( idDynamicBlock<type> *block );
 	void							UnlinkFreeInternal( idDynamicBlock<type> *block );
@@ -762,7 +762,7 @@ int idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::GetNumEmptyBa
 }
 
 template<class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-type *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Alloc( const int num ) {
+type *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Alloc( const size_t num ) {
 	idDynamicBlock<type> *block;
 
 	numAllocs++;
@@ -791,7 +791,7 @@ type *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Alloc( cons
 }
 
 template<class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-type *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Resize( type *ptr, const int num ) {
+type *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Resize( type *ptr, const size_t num ) {
 
 	numResizes++;
 
@@ -906,7 +906,7 @@ void idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::Clear() {
 }
 
 template<class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-idDynamicBlock<type> *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::AllocInternal( const int num ) {
+idDynamicBlock<type> *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::AllocInternal( const size_t num ) {
 	idDynamicBlock<type> *block;
 	int alignedBytes = ( num * sizeof( type ) + 15 ) & ~15;
 
@@ -942,7 +942,7 @@ idDynamicBlock<type> *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _ta
 }
 
 template<class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-idDynamicBlock<type> *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::ResizeInternal( idDynamicBlock<type> *block, const int num ) {
+idDynamicBlock<type> *idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::ResizeInternal( idDynamicBlock<type> *block, const size_t num ) {
 	int alignedBytes = ( num * sizeof( type ) + 15 ) & ~15;
 
 #ifdef DYNAMIC_BLOCK_ALLOC_CHECK

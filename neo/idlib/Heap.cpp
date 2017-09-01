@@ -67,7 +67,7 @@ void Mem_Free16( void *ptr ) {
 Mem_ClearedAlloc
 ==================
 */
-void * Mem_ClearedAlloc( const int size, const memTag_t tag ) {
+void * Mem_ClearedAlloc( const size_t size, const memTag_t tag ) {
 	void * mem = Mem_Alloc( size, tag );
 	SIMDProcessor->Memset( mem, 0, size );
 	return mem;

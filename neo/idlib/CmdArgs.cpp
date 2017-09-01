@@ -185,7 +185,8 @@ void idCmdArgs::AppendArg( const char *text ) {
 		idStr::Copynz( tokenized, text, sizeof( tokenized ) );
 	} else {
 		argv[ argc ] = argv[ argc-1 ] + strlen( argv[ argc-1 ] ) + 1;
-		idStr::Copynz( argv[ argc ], text, sizeof( tokenized ) - ( argv[ argc ] - tokenized ) );
+		//TODO assert sizeof against max int
+		idStr::Copynz( argv[ argc ], text, static_cast<int>( sizeof( tokenized ) ) - ( argv[ argc ] - tokenized ) );
 		argc++;
 	}
 }

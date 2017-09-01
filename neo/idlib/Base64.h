@@ -43,7 +43,7 @@ public:
 				idBase64( const idStr &s );
 				~idBase64();
 
-	void		Encode( const byte *from, int size );
+	void		Encode( const byte *from, size_t size );
 	void		Encode( const idStr &src );
 	size_t		DecodeLength() const; // minimum size in bytes of destination buffer for decoding
 	size_t		Decode( byte *to ) const; // does not append a \0 - needs a DecodeLength() bytes buffer
@@ -56,12 +56,12 @@ public:
 
 private:
 	byte *		data;
-	int			len;
-	int			alloced;
+	size_t		len;
+	size_t		alloced;
 
 	void		Init();
 	void		Release();
-	void		EnsureAlloced( int size );
+	void		EnsureAlloced( size_t size );
 };
 
 ID_INLINE idBase64::idBase64() {
@@ -94,7 +94,7 @@ ID_INLINE void idBase64::Release() {
 	Init();
 }
 
-ID_INLINE void idBase64::EnsureAlloced( int size ) {
+ID_INLINE void idBase64::EnsureAlloced( size_t size ) {
 	if ( size > alloced ) {
 		Release();
 	}

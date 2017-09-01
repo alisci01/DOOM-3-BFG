@@ -41,7 +41,7 @@ idBase64::Encode
 static const char sixtet_to_base64[] = 
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void idBase64::Encode( const byte *from, int size ) {
+void idBase64::Encode( const byte *from, size_t size ) {
 	int i, j;
 	unsigned long w;
 	byte *to;

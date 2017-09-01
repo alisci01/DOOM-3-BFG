@@ -570,11 +570,12 @@ idDict::MatchPrefix
 */
 const idKeyValue *idDict::MatchPrefix( const char *prefix, const idKeyValue *lastMatch ) const {
 	int	i;
-	size_t len;
+	int len;
 	int start;
 
 	assert( prefix );
-	len = strlen( prefix );
+	//TODO check against max int
+	len = static_cast<int>( strlen( prefix ) );
 
 	start = -1;
 	if ( lastMatch ) {

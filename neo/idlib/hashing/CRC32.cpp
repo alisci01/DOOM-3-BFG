@@ -142,7 +142,7 @@ void CRC32_Update( unsigned long &crcvalue, const byte data ) {
 	crcvalue = crctable[ ( crcvalue ^ data ) & 0xff ] ^ ( crcvalue >> 8 );
 }
 
-void CRC32_UpdateChecksum( unsigned long &crcvalue, const void *data, int length ) {
+void CRC32_UpdateChecksum( unsigned long &crcvalue, const void *data, size_t length ) {
 	unsigned long crc;
 	const unsigned char *buf = (const unsigned char *) data;
 
@@ -157,7 +157,7 @@ void CRC32_FinishChecksum( unsigned long &crcvalue ) {
 	crcvalue ^= CRC32_XOR_VALUE;
 }
 
-unsigned long CRC32_BlockChecksum( const void *data, int length ) {
+unsigned long CRC32_BlockChecksum( const void *data, size_t length ) {
 	unsigned long crc;
 
 	CRC32_InitChecksum( crc );
