@@ -1259,7 +1259,7 @@ int idStr::Cmp( const char *s1, const char *s2 ) {
 idStr::Cmpn
 ================
 */
-int idStr::Cmpn( const char *s1, const char *s2, size_t n ) {
+int idStr::Cmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1319,7 +1319,7 @@ int idStr::Icmp( const char *s1, const char *s2 ) {
 idStr::Icmpn
 ================
 */
-int idStr::Icmpn( const char *s1, const char *s2, size_t n ) {
+int idStr::Icmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 	assert( n >= 0 );
@@ -1466,7 +1466,7 @@ int idStr::IcmpPath( const char *s1, const char *s2 ) {
 idStr::IcmpnPath
 ================
 */
-int idStr::IcmpnPath( const char *s1, const char *s2, size_t n ) {
+int idStr::IcmpnPath( const char *s1, const char *s2, int n ) {
 	int c1, c2, d;
 
 #if 0
@@ -1543,7 +1543,7 @@ idStr::Copynz
 Safe strncpy that ensures a trailing zero
 =============
 */
-void idStr::Copynz( char *dest, const char *src, size_t destsize ) {
+void idStr::Copynz( char *dest, const char *src, int destsize ) {
 	if ( !src ) {
 		idLib::common->Warning( "idStr::Copynz: NULL src" );
 		return;

@@ -291,7 +291,7 @@ void idSaveGame::WriteString( const char *string ) {
 	stringHash.Add( hash, stringTable.Num() - 1 );
 
 	WriteInt( curStringTableOffset );
-	curStringTableOffset += ( strlen( string ) + 4 );
+	curStringTableOffset += ( idStr::Length( string ) + 4 );
 }
 
 /*

@@ -797,7 +797,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 	}
 
 	popParms = argsize;
-	eventEntity->ProcessEventArgPtr( evdef, data );
+	eventEntity->ProcessEventArgPtr( evdef, reinterpret_cast<void **>( data ) );
 
 	if ( !multiFrameEvent ) {
 		if ( popParms ) {
@@ -928,7 +928,7 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 	}
 
 	popParms = argsize;
-	thread->ProcessEventArgPtr( evdef, data );
+	thread->ProcessEventArgPtr( evdef, reinterpret_cast<void **>( data ) );
 	if ( popParms ) {
 		PopParms( popParms );
 	}

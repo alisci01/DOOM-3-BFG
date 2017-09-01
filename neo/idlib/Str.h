@@ -186,12 +186,12 @@ public:
 
 						// case sensitive compare
 	int					Cmp( const char *text ) const;
-	int					Cmpn( const char *text, size_t n ) const;
+	int					Cmpn( const char *text, int n ) const;
 	int					CmpPrefix( const char *text ) const;
 
 						// case insensitive compare
 	int					Icmp( const char *text ) const;
-	int					Icmpn( const char *text, size_t n ) const;
+	int					Icmpn( const char *text, int n ) const;
 	int					IcmpPrefix( const char *text ) const;
 
 						// case insensitive compare ignoring color
@@ -199,7 +199,7 @@ public:
 
 						// compares paths and makes sure folders come first
 	int					IcmpPath( const char *text ) const;
-	int					IcmpnPath( const char *text, size_t n ) const;
+	int					IcmpnPath( const char *text, int n ) const;
 	int					IcmpPrefixPath( const char *text ) const;
 
 	int					Length() const;
@@ -292,14 +292,14 @@ public:
 	static int			LengthWithoutColors( const char *s );
 	static char *		RemoveColors( char *s );
 	static int			Cmp( const char *s1, const char *s2 );
-	static int			Cmpn( const char *s1, const char *s2, size_t n );
+	static int			Cmpn( const char *s1, const char *s2, int n );
 	static int			Icmp( const char *s1, const char *s2 );
-	static int			Icmpn( const char *s1, const char *s2, size_t n );
+	static int			Icmpn( const char *s1, const char *s2, int n );
 	static int			IcmpNoColor( const char *s1, const char *s2 );
 	static int			IcmpPath( const char *s1, const char *s2 );			// compares paths and makes sure folders come first
-	static int			IcmpnPath( const char *s1, const char *s2, size_t n );	// compares paths and makes sure folders come first
+	static int			IcmpnPath( const char *s1, const char *s2, int n );	// compares paths and makes sure folders come first
 	static void			Append( char *dest, int size, const char *src );
-	static void			Copynz( char *dest, const char *src, size_t destsize );
+	static void			Copynz( char *dest, const char *src, int destsize );
 	static int			snPrintf( char *dest, int size, VERIFY_FORMAT_STRING const char *fmt, ... );
 	static int			vsnPrintf( char *dest, int size, const char *fmt, va_list argptr );
 	static int			FindChar( const char *str, const char c, int start = 0, int end = -1 );
@@ -755,7 +755,7 @@ ID_INLINE int idStr::Cmp( const char *text ) const {
 	return idStr::Cmp( data, text );
 }
 
-ID_INLINE int idStr::Cmpn( const char *text, size_t n ) const {
+ID_INLINE int idStr::Cmpn( const char *text, int n ) const {
 	assert( text );
 	return idStr::Cmpn( data, text, n );
 }
@@ -770,7 +770,7 @@ ID_INLINE int idStr::Icmp( const char *text ) const {
 	return idStr::Icmp( data, text );
 }
 
-ID_INLINE int idStr::Icmpn( const char *text, size_t n ) const {
+ID_INLINE int idStr::Icmpn( const char *text, int n ) const {
 	assert( text );
 	return idStr::Icmpn( data, text, n );
 }
@@ -790,7 +790,7 @@ ID_INLINE int idStr::IcmpPath( const char *text ) const {
 	return idStr::IcmpPath( data, text );
 }
 
-ID_INLINE int idStr::IcmpnPath( const char *text, size_t n ) const {
+ID_INLINE int idStr::IcmpnPath( const char *text, int n ) const {
 	assert( text );
 	return idStr::IcmpnPath( data, text, n );
 }
