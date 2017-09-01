@@ -871,7 +871,7 @@ void idActor::Save( idSaveGame *savefile ) const {
 
 	//FIXME: this is unneccesary
 	if ( state ) {
-		idLexer src( state->Name(), idStr::Length( state->Name() ), "idAI::Save" );
+		idLexer src( state->Name(), strlen( state->Name() ), "idAI::Save" );
 
 		src.ReadTokenOnLine( &token );
 		src.ExpectTokenString( "::" );
@@ -883,7 +883,7 @@ void idActor::Save( idSaveGame *savefile ) const {
 	}
 
 	if ( idealState ) {
-		idLexer src( idealState->Name(), idStr::Length( idealState->Name() ), "idAI::Save" );
+		idLexer src( idealState->Name(), strlen( idealState->Name() ), "idAI::Save" );
 
 		src.ReadTokenOnLine( &token );
 		src.ExpectTokenString( "::" );

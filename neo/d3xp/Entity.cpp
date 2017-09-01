@@ -3944,7 +3944,7 @@ idCurve_Spline<idVec3> *idEntity::GetSpline() const {
 		return NULL;
 	}
 
-	idStr str = kv->GetKey().Right( kv->GetKey().Length() - strlen( curveTag ) );
+	idStr str = kv->GetKey().Right( kv->GetKey().Length() - idStr::Length( curveTag ) );
 	if ( str.Icmp( "CatmullRomSpline" ) == 0 ) {
 		spline = new (TAG_ENTITY) idCurve_CatmullRomSpline<idVec3>();
 	} else if ( str.Icmp( "nubs" ) == 0 ) {

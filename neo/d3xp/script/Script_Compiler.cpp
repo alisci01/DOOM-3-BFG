@@ -584,8 +584,9 @@ idVarDef *idCompiler::EmitOpcode( const opcode_t *op, idVarDef *var_a, idVarDef 
 	}
 	
 	statement = gameLocal.program.AllocStatement();
-	statement->linenumber	= currentLineNumber;
-	statement->file 		= currentFileNumber;
+	//TODO assert against maxs of size_t and int against uint16
+	statement->linenumber	= static_cast<uint16>( currentLineNumber );
+	statement->file 		= static_cast<uint16>( currentFileNumber );
 	
 	if ( ( op->type_c == &def_void ) || op->rightAssociative ) {
 		// ifs, gotos, and assignments don't need vars allocated
@@ -2422,7 +2423,7 @@ void idCompiler::ParseEventDef( idTypeDef *returnType, const char *name ) {
 	ExpectToken( "(" );
 
 	format = ev->GetArgFormat();
-	num = strlen( format );
+	num = idStr::Length( format );
 	for( i = 0; i < num; i++ ) {
 		expectedType = GetTypeForEventArg( format[ i ] );
 		if ( expectedType == NULL || ( expectedType == &type_void ) ) {
@@ -2631,7 +2632,7 @@ void idCompiler::CompileFile( const char *text, const char *filename, bool toCon
 			// don't print line number of an error if were calling script from the console using the "script" command
 			sprintf( errorStr, "Error: %s\n", err.GetError() );
 		} else {
-			sprintf( errorStr, "Error: file %s, line %d: %s\n", gameLocal.program.GetFilename( currentFileNumber ), currentLineNumber, err.GetError() );
+			sprintf( errorStr, "Error: file %s, line %zu: %s\n", gameLocal.program.GetFilename( currentFileNumber ), currentLineNumber, err.GetError() );
 		}
 
 		parser.FreeSource();

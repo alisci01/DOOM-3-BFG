@@ -691,7 +691,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 	varEval_t			var;
 	int 				pos;
 	int 				start;
-	int					data[ D_EVENT_MAXARGS ];
+	void				*data[ D_EVENT_MAXARGS ];
 	const idEventDef	*evdef;
 	const char			*format;
 
@@ -751,7 +751,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 		switch( format[ i ] ) {
 		case D_EVENT_INTEGER :
 			var.intPtr = ( int * )&localstack[ start + pos ];
-			data[ i ] = int( *var.floatPtr );
+			data[ i ] = reinterpret_cast<void *>( static_cast<ID_PTR_SIGNED_SIZE_TYPE>( *var.floatPtr ) );
 			break;
 
 		case D_EVENT_FLOAT :
@@ -797,7 +797,7 @@ void idInterpreter::CallEvent( const function_t *func, int argsize ) {
 	}
 
 	popParms = argsize;
-	eventEntity->ProcessEventArgPtr( evdef, reinterpret_cast<void **>( data ) );
+	eventEntity->ProcessEventArgPtr( evdef, data );
 
 	if ( !multiFrameEvent ) {
 		if ( popParms ) {
@@ -863,7 +863,7 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 	varEval_t			source;
 	int 				pos;
 	int 				start;
-	int					data[ D_EVENT_MAXARGS ];
+	void				*data[ D_EVENT_MAXARGS ];
 	const idEventDef	*evdef;
 	const char			*format;
 
@@ -928,7 +928,7 @@ void idInterpreter::CallSysEvent( const function_t *func, int argsize ) {
 	}
 
 	popParms = argsize;
-	thread->ProcessEventArgPtr( evdef, reinterpret_cast<void **>( data ) );
+	thread->ProcessEventArgPtr( evdef, data );
 	if ( popParms ) {
 		PopParms( popParms );
 	}

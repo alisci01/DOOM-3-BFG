@@ -3535,7 +3535,7 @@ int idGameLocal::GetTargets( const idDict &args, idList< idEntityPtr<idEntity> >
 
 	list.Clear();
 
-	refLength = strlen( ref );
+	refLength = idStr::Length( ref );
 	num = args.GetNumKeyVals();
 	for( i = 0; i < num; i++ ) {
 

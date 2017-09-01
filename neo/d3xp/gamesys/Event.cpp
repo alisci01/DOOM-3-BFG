@@ -76,7 +76,7 @@ idEventDef::idEventDef( const char *command, const char *formatspec, char return
 	this->formatspec = formatspec;
 	this->returnType = returnType;
 
-	numargs = strlen( formatspec );
+	numargs = idStr::Length( formatspec );
 	assert( numargs <= D_EVENT_MAXARGS );
 	if ( numargs > D_EVENT_MAXARGS ) {
 		eventError = true;
@@ -127,6 +127,7 @@ idEventDef::idEventDef( const char *command, const char *formatspec, char return
 			break;
 		}
 	}
+	//TODO assert against argsize going beyond int max as GetArgSize function returns int
 
 	// calculate the formatspecindex
 	formatspecIndex = ( 1 << ( numargs + D_EVENT_MAXARGS ) ) | bits;
@@ -273,7 +274,7 @@ idEvent *idEvent::Alloc( const idEventDef *evdef, int numargs, va_list args ) {
 		arg = va_arg( args, idEventArg * );
 		if ( format[ i ] != arg->type ) {
 			// when NULL is passed in for an entity, it gets cast as an integer 0, so don't give an error when it happens
-			if ( !( ( ( format[ i ] == D_EVENT_TRACE ) || ( format[ i ] == D_EVENT_ENTITY ) ) && ( arg->type == 'd' ) && ( arg->value == 0 ) ) ) {
+			if ( !( ( ( format[ i ] == D_EVENT_TRACE ) || ( format[ i ] == D_EVENT_ENTITY ) ) && ( arg->type == 'd' ) && ( arg->value.vptr == nullptr ) ) ) {
 				gameLocal.Error( "idEvent::Alloc : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
 			}
 		}
@@ -348,7 +349,7 @@ void idEvent::CopyArgs( const idEventDef *evdef, int numargs, va_list args, void
 		arg = va_arg( args, idEventArg * );
 		if ( format[ i ] != arg->type ) {
 			// when NULL is passed in for an entity, it gets cast as an integer 0, so don't give an error when it happens
-			if ( !( ( ( format[ i ] == D_EVENT_TRACE ) || ( format[ i ] == D_EVENT_ENTITY ) ) && ( arg->type == 'd' ) && ( arg->value == 0 ) ) ) {
+			if ( !( ( ( format[ i ] == D_EVENT_TRACE ) || ( format[ i ] == D_EVENT_ENTITY ) ) && ( arg->type == 'd' ) && ( arg->value.vptr == nullptr ) ) ) {
 				gameLocal.Error( "idEvent::CopyArgs : Wrong type passed in for arg # %d on '%s' event.", i, evdef->GetName() );
 			}
 		}
@@ -489,8 +490,8 @@ idEvent::ServiceEvents
 void idEvent::ServiceEvents() {
 	idEvent		*event;
 	int			num;
-	int			args[ D_EVENT_MAXARGS ];
-	int			offset;
+	void*		args[ D_EVENT_MAXARGS ];
+	size_t		offset;
 	int			i;
 	int			numargs;
 	const char	*formatspec;
@@ -520,7 +521,7 @@ void idEvent::ServiceEvents() {
 			switch( formatspec[ i ] ) {
 			case D_EVENT_FLOAT :
 			case D_EVENT_INTEGER :
-				args[ i ] = *reinterpret_cast<int *>( &data[ offset ] );
+				args[ i ] = reinterpret_cast<void *>( static_cast<ID_PTR_SIGNED_SIZE_TYPE>( *reinterpret_cast<int *>( &data[ offset ] ) ) );
 				break;
 
 			case D_EVENT_VECTOR :
@@ -528,7 +529,7 @@ void idEvent::ServiceEvents() {
 				break;
 
 			case D_EVENT_STRING :
-				*reinterpret_cast<const char **>( &args[ i ] ) = reinterpret_cast<const char *>( &data[ offset ] );
+				*reinterpret_cast<char **>( &args[ i ] ) = reinterpret_cast<char *>( &data[ offset ] );
 				break;
 
 			case D_EVENT_ENTITY :
@@ -590,8 +591,8 @@ idEvent::ServiceFastEvents
 void idEvent::ServiceFastEvents() {
 	idEvent	*event;
 	int		num;
-	int			args[ D_EVENT_MAXARGS ];
-	int			offset;
+	void*		args[ D_EVENT_MAXARGS ];
+	size_t		offset;
 	int			i;
 	int			numargs;
 	const char	*formatspec;
@@ -619,7 +620,7 @@ void idEvent::ServiceFastEvents() {
 			switch( formatspec[ i ] ) {
 			case D_EVENT_FLOAT :
 			case D_EVENT_INTEGER :
-				args[ i ] = *reinterpret_cast<int *>( &data[ offset ] );
+				args[ i ] = reinterpret_cast<void *>( static_cast<ID_PTR_SIGNED_SIZE_TYPE>( *reinterpret_cast<int *>( &data[ offset ] ) ) );
 				break;
 
 			case D_EVENT_VECTOR :
@@ -627,7 +628,7 @@ void idEvent::ServiceFastEvents() {
 				break;
 
 			case D_EVENT_STRING :
-				*reinterpret_cast<const char **>( &args[ i ] ) = reinterpret_cast<const char *>( &data[ offset ] );
+				*reinterpret_cast<char **>( &args[ i ] ) = reinterpret_cast<char *>( &data[ offset ] );
 				break;
 
 			case D_EVENT_ENTITY :

@@ -242,8 +242,8 @@ idList<idTypeInfo *, TAG_IDCLASS>	idClass::typenums;
 
 bool	idClass::initialized	= false;
 int		idClass::typeNumBits	= 0;
-int		idClass::memused		= 0;
-int		idClass::numobjects		= 0;
+size_t	idClass::memused		= 0;
+size_t	idClass::numobjects		= 0;
 
 /*
 ================
@@ -442,10 +442,11 @@ idClass::new
 ================
 */
 void * idClass::operator new( size_t s ) {
-	int *p;
+	//TODO verify this; tacks on 4 more bytes on 64bit systems
+	size_t *p;
 
 	s += sizeof( int );
-	p = (int *)Mem_Alloc( s, TAG_IDCLASS );
+	p = (size_t *)Mem_Alloc( s, TAG_IDCLASS );
 	*p = s;
 	memused += s;
 	numobjects++;

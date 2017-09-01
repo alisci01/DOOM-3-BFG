@@ -221,9 +221,11 @@ extern volatile int ignoredReturnValue;
 #endif
 
 #ifdef ID_X64
-#define ID_PTR_SIZE_TYPE	uint64
+#define ID_PTR_SIZE_TYPE		uint64
+#define ID_PTR_SIGNED_SIZE_TYPE	int64
 #elif ID_X32
-#define ID_PTR_SIZE_TYPE	uint32
+#define ID_PTR_SIZE_TYPE		uint32
+#define ID_PTR_SIGNED_SIZE_TYPE	int32
 #endif
 
 #endif

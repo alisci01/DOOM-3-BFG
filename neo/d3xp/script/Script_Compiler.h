@@ -211,7 +211,7 @@ private:
 	bool			callthread;
 	int				braceDepth;
 	int				loopDepth;
-	int				currentLineNumber;
+	size_t			currentLineNumber;
 	int				currentFileNumber;
 	int				errorCount;
 					

@@ -91,7 +91,7 @@ public:
 
 	int						GetBuildNumber() const { return version; }
 
-	int						GetCurrentSaveSize() const { return file->Length(); }
+	size_t					GetCurrentSaveSize() const { return file->Length(); }
 
 private:
 	idFile *				file;
