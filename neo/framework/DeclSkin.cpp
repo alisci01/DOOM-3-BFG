@@ -53,7 +53,7 @@ void idDeclSkin::FreeData() {
 idDeclSkin::Parse
 ================
 */
-bool idDeclSkin::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclSkin::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken	token, token2;
 

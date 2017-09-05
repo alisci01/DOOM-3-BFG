@@ -3027,11 +3027,23 @@ cm_model_t * idCollisionModelManagerLocal::LoadBinaryModelFromFile( idFile *file
 	}
 
 	file->ReadBig( model->polygonMemory );
+#if defined( ID_X64 )
+	// on 32bit systems, size of cm_polygon_t has the size of 0x3c bytes vs. 0x40 on 64bit systems
+	// we need to add on a bit extra to polygonMemory as it was built for 32 bit systems in mind
+	//TODO selectively do this for 64bit supported data formats
+	model->polygonMemory += model->numPolygons * 4;
+#endif
 	model->polygonBlock = (cm_polygonBlock_t *) Mem_ClearedAlloc( sizeof( cm_polygonBlock_t ) + model->polygonMemory, TAG_COLLISION );
 	model->polygonBlock->bytesRemaining = model->polygonMemory;
 	model->polygonBlock->next = ( (byte *) model->polygonBlock ) + sizeof( cm_polygonBlock_t );
 
 	file->ReadBig( model->brushMemory );
+#if defined( ID_X64 )
+	// on 32bit systems, size of cm_brush_t has the size of 0x3c bytes vs. 0x40 on 64bit systems
+	// we need to add on a bit extra to polygonMemory as it was built for 32 bit systems in mind
+	//TODO selectively do this for 64bit supported data formats
+	model->brushMemory += model->numBrushes * 4;
+#endif
 	model->brushBlock = (cm_brushBlock_t *) Mem_ClearedAlloc( sizeof( cm_brushBlock_t ) + model->brushMemory, TAG_COLLISION );
 	model->brushBlock->bytesRemaining = model->brushMemory;
 	model->brushBlock->next = ( (byte *) model->brushBlock ) + sizeof( cm_brushBlock_t );

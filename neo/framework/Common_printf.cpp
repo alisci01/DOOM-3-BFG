@@ -119,7 +119,7 @@ void idCommonLocal::VPrintf( const char *fmt, va_list args ) {
 			sprintf( msg, "[%i]", t );
 		}
 	} 
-	timeLength = strlen( msg );
+	timeLength = idStr::Length( msg );
 	// don't overflow
 	if ( idStr::vsnPrintf( msg+timeLength, MAX_PRINT_MSG_SIZE-timeLength-1, fmt, args ) < 0 ) {
 		msg[sizeof(msg)-2] = '\n'; msg[sizeof(msg)-1] = '\0'; // avoid output garbling

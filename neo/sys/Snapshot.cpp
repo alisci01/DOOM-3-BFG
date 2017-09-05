@@ -855,7 +855,9 @@ bool idSnapShot::WriteDelta( idSnapShot & old, int visIndex, idFile * file, int 
 	for ( int i = 0; i < objectStates.Num(); i++ ) {
 		objectState_t & newState = *objectStates[i];
 
-		if ( optimalLength > 0 && file->Length() >= optimalLength ) {
+		//TODO support size_t
+		assert( optimalLength >= 0 );
+		if ( optimalLength > 0 && file->Length() >= static_cast<size_t>( optimalLength ) ) {
 			return false;
 		}
 
@@ -870,7 +872,9 @@ bool idSnapShot::WriteDelta( idSnapShot & old, int visIndex, idFile * file, int 
 			continue;
 		}
 
-		if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= maxLength ) {
+		//TODO support size_t
+		assert( maxLength >= 0 );
+		if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= static_cast<size_t>( maxLength ) ) {
 			return false;
 		}
 		
@@ -882,7 +886,9 @@ bool idSnapShot::WriteDelta( idSnapShot & old, int visIndex, idFile * file, int 
 
 		// write any deleted entities up to this one
 		for ( ; newState.objectNum > old.objectStates[j]->objectNum; j++ ) {
-			if ( file->Length() + objectHeaderSize >= maxLength ) {
+			//TODO support size_t
+			assert( maxLength >= 0 );
+			if ( file->Length() + objectHeaderSize >= static_cast<size_t>( maxLength ) ) {
 				return false;
 			}
 			objectState_t & oldState = *old.objectStates[j];
@@ -894,13 +900,17 @@ bool idSnapShot::WriteDelta( idSnapShot & old, int visIndex, idFile * file, int 
 
 		if ( newState.objectNum == oldState.objectNum ) {
 			// FIXME: We don't need to early out if WriteObject determines that we won't send the object due to being stale
-			if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= maxLength ) {
+			//TODO support size_t
+			assert( maxLength >= 0 );
+			if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= static_cast<size_t>( maxLength ) ) {
 				return false;
 			}
 			WriteObject( file, visIndex, &newState, &oldState, lastobjectNum );
 			j++;
 		} else {
-			if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= maxLength ) {
+			//TODO support size_t
+			assert( maxLength >= 0 );
+			if ( file->Length() + objectHeaderSize + newState.buffer.Size() >= static_cast<size_t>( maxLength ) ) {
 				return false;
 			}
 
@@ -910,18 +920,24 @@ bool idSnapShot::WriteDelta( idSnapShot & old, int visIndex, idFile * file, int 
 	}
 	// Finally, remove any entities at the end
 	for ( ; j < old.objectStates.Num(); j++ ) {
-		if ( file->Length() + objectHeaderSize >= maxLength ) {
+		//TODO support size_t
+		assert( maxLength >= 0 );
+		if ( file->Length() + objectHeaderSize >= static_cast<size_t>( maxLength ) ) {
 			return false;
 		}
 
-		if ( optimalLength > 0 && file->Length() >= optimalLength ) {
+		//TODO support size_t
+		assert( maxLength >= 0 );
+		if ( optimalLength > 0 && file->Length() >= static_cast<size_t>( optimalLength ) ) {
 			return false;
 		}
 
 		objectState_t & oldState = *old.objectStates[j];
 		WriteObject( file, visIndex, NULL, &oldState, lastobjectNum );
 	}
-	if ( file->Length() + 2 >= maxLength ) {
+	//TODO support size_t
+	assert( maxLength >= 0 );
+	if ( file->Length() + 2 >= static_cast<size_t>( maxLength ) ) {
 		return false;
 	}
 	uint16 objectDelta = 0xFFFF - lastobjectNum;

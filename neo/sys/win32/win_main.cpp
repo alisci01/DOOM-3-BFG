@@ -57,7 +57,7 @@ idCVar Win32Vars_t::win_username( "win_username", "", CVAR_SYSTEM | CVAR_INIT, "
 idCVar Win32Vars_t::win_outputEditString( "win_outputEditString", "1", CVAR_SYSTEM | CVAR_BOOL, "" );
 idCVar Win32Vars_t::win_viewlog( "win_viewlog", "0", CVAR_SYSTEM | CVAR_INTEGER, "" );
 idCVar Win32Vars_t::win_timerUpdate( "win_timerUpdate", "0", CVAR_SYSTEM | CVAR_BOOL, "allows the game to be updated while dragging the window" );
-idCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "0", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
+idCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "1", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
 
 Win32Vars_t	win32;
 
@@ -569,7 +569,7 @@ Sys_ListFiles
 int Sys_ListFiles( const char *directory, const char *extension, idStrList &list ) {
 	idStr		search;
 	struct _finddata_t findinfo;
-	int			findhandle;
+	intptr_t	findhandle;
 	int			flag;
 
 	if ( !extension) {
@@ -846,9 +846,9 @@ DLL Loading
 Sys_DLL_Load
 =====================
 */
-int Sys_DLL_Load( const char *dllName ) {
+ptrdiff_t Sys_DLL_Load( const char *dllName ) {
 	HINSTANCE libHandle = LoadLibrary( dllName );
-	return (int)libHandle;
+	return reinterpret_cast<ptrdiff_t>( libHandle );
 }
 
 /*
@@ -856,8 +856,8 @@ int Sys_DLL_Load( const char *dllName ) {
 Sys_DLL_GetProcAddress
 =====================
 */
-void *Sys_DLL_GetProcAddress( int dllHandle, const char *procName ) {
-	return GetProcAddress( (HINSTANCE)dllHandle, procName ); 
+void *Sys_DLL_GetProcAddress( ptrdiff_t dllHandle, const char *procName ) {
+	return GetProcAddress( reinterpret_cast<HINSTANCE>( dllHandle ), procName ); 
 }
 
 /*
@@ -865,11 +865,11 @@ void *Sys_DLL_GetProcAddress( int dllHandle, const char *procName ) {
 Sys_DLL_Unload
 =====================
 */
-void Sys_DLL_Unload( int dllHandle ) {
+void Sys_DLL_Unload( ptrdiff_t dllHandle ) {
 	if ( !dllHandle ) {
 		return;
 	}
-	if ( FreeLibrary( (HINSTANCE)dllHandle ) == 0 ) {
+	if ( FreeLibrary( reinterpret_cast<HINSTANCE>( dllHandle ) ) == 0 ) {
 		int lastError = GetLastError();
 		LPVOID lpMsgBuf;
 		FormatMessage(
@@ -985,7 +985,7 @@ void Sys_GenerateEvents() {
 		char	*b;
 		int		len;
 
-		len = strlen( s ) + 1;
+		len = idStr::Length( s ) + 1;
 		b = (char *)Mem_Alloc( len, TAG_EVENTS );
 		strcpy( b, s );
 		Sys_QueEvent( SE_CONSOLE, 0, 0, len, b, 0 );
@@ -1178,7 +1178,7 @@ void Sys_Init() {
 		win32.sys_cpustring.SetString( string );
 	} else {
 		common->Printf( "forcing CPU type to " );
-		idLexer src( win32.sys_cpustring.GetString(), idStr::Length( win32.sys_cpustring.GetString() ), "sys_cpustring" );
+		idLexer src( win32.sys_cpustring.GetString(), idStr::SizeLength( win32.sys_cpustring.GetString() ), "sys_cpustring" );
 		idToken token;
 
 		int id = CPUID_NONE;
@@ -1264,6 +1264,7 @@ void Win_Frame() {
 	}
 }
 
+#if defined( ID_X32 )
 extern "C" { void _chkstk( int size ); };
 void clrstk();
 
@@ -1291,6 +1292,7 @@ void HackChkStk() {
 
 	TestChkStk();
 }
+#endif
 
 /*
 ====================
@@ -1381,6 +1383,7 @@ _except_handler
 EXCEPTION_DISPOSITION __cdecl _except_handler( struct _EXCEPTION_RECORD *ExceptionRecord, void * EstablisherFrame,
 												struct _CONTEXT *ContextRecord, void * DispatcherContext ) {
 
+#if defined( ID_X32 )
 	static char msg[ 8192 ];
 	char FPUFlags[2048];
 
@@ -1439,6 +1442,10 @@ EXCEPTION_DISPOSITION __cdecl _except_handler( struct _EXCEPTION_RECORD *Excepti
 
 	EmailCrashReport( msg );
 	common->FatalError( msg );
+#else
+#pragma message( "win_main.cpp: implement support for proper message on exception handler on 64bit platforms" )
+	common->FatalError( "EXCEPTION HAPPENED" );
+#endif
 
     // Tell the OS to restart the faulting instruction
     return ExceptionContinueExecution;
@@ -1501,7 +1508,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #endif
 
 //	Sys_FPU_EnableExceptions( TEST_FPU_EXCEPTIONS );
+#if defined( ID_X32 )
 	Sys_FPU_SetPrecision( FPU_PRECISION_DOUBLE_EXTENDED );
+#else
+	//TODO investigate why we need this
+#pragma message( "win_main.cpp: Write support for FPU Set Precision" )
+#endif
 
 	common->Init( 0, NULL, lpCmdLine );
 
@@ -1538,8 +1550,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		Sys_MemFrame();
 #endif
 
+#if defined( ID_X32 )
 		// set exceptions, even if some crappy syscall changes them!
 		Sys_FPU_EnableExceptions( TEST_FPU_EXCEPTIONS );
+#else
+		//TODOe evaluate if we need to do this
+#pragma message( "win_main.cpp: Support FPU enable exceptions" )
+#endif
 
 		// run the game
 		common->Frame();
@@ -1557,6 +1574,10 @@ I tried to get the run time to call this at every function entry, but
 ====================
 */
 static int	parmBytes;
+#if defined( ID_X64 )
+void clrstk() {
+	assert( false && "currently unsupported on this platform" );
+#else
 __declspec( naked ) void clrstk() {
 	// eax = bytes to add to stack
 	__asm {
@@ -1583,6 +1604,7 @@ __declspec( naked ) void clrstk() {
         
         ret
 	}
+#endif
 }
 
 /*

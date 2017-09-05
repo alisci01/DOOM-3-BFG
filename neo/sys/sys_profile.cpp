@@ -228,13 +228,13 @@ void idProfileMgr::OnLoadSettingsCompleted( idSaveLoadParms * parms ) {
 		unsigned int originalChecksum;
 		profileFile->ReadBig( originalChecksum );
 
-		int dataLength = profileFile->Length() - (int)sizeof( originalChecksum );
+		size_t dataLength = profileFile->Length() - sizeof( originalChecksum );
 		profileFile->ReadBigArray( buffer.Ptr(), dataLength );
 
 		// Validate the checksum before we let the game serialize the settings
 		unsigned int checksum = MD5_BlockChecksum( buffer.Ptr(), dataLength );
 		if ( originalChecksum != checksum ) {
-			idLib::Warning( "Checksum: 0x%08x, originalChecksum: 0x%08x, size = %d", checksum, originalChecksum, dataLength );
+			idLib::Warning( "Checksum: 0x%08x, originalChecksum: 0x%08x, size = %zu", checksum, originalChecksum, dataLength );
 			parms->errorCode = SAVEGAME_E_CORRUPTED;
 		} else {
 			idBitMsg msg;

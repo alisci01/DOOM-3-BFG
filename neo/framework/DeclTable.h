@@ -42,7 +42,7 @@ class idDeclTable : public idDecl {
 public:
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
-	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion );
+	virtual bool			Parse( const char *text, const size_t textLength, bool allowBinaryVersion = false );
 	virtual void			FreeData();
 
 	float					TableLookup( float index ) const;

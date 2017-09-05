@@ -249,35 +249,35 @@ void idSimpleWindow::Redraw(float x, float y) {
 	textRect.Offset(-x, -y);
 }
 
-int idSimpleWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
-	int ret = -1;
+ptrdiff_t idSimpleWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
+	ptrdiff_t ret = -1;
 
 	if ( wv == &rect ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->rect;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->rect );
 	}
 
 	if ( wv == &backColor ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->backColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->backColor );
 	}
 
 	if ( wv == &matColor ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->matColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->matColor );
 	}
 
 	if ( wv == &foreColor ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->foreColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->foreColor );
 	}
 
 	if ( wv == &borderColor ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->borderColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->borderColor );
 	}
 
 	if ( wv == &textScale ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->textScale;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->textScale );
 	}
 
 	if ( wv == &rotate ) {
-		ret = (int)&( ( idSimpleWindow * ) 0 )->rotate;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idSimpleWindow * ) 0 )->rotate );
 	}
 
 	if ( ret != -1 ) {
@@ -360,7 +360,7 @@ void idSimpleWindow::WriteToSaveGame( idFile *savefile ) {
 	int stringLen;
 
 	if ( background ) {
-		stringLen = strlen( background->GetName() );
+		stringLen = idStr::Length( background->GetName() );
 		savefile->Write( &stringLen, sizeof( stringLen ) );
 		savefile->Write( background->GetName(), stringLen );
 	} else {

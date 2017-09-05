@@ -1030,7 +1030,7 @@ int idDeviceContextOptimized::DrawText(float x, float y, float scale, idVec4 col
 			if ( colorIndex == C_COLOR_DEFAULT ) {
 				newColor = color;
 			} else {
-				newColor = idStr::ColorForIndex( colorIndex );
+				newColor = idStr::ColorForIndex( static_cast<size_t>( colorIndex ) );
 				newColor[3] = color[3];
 			}
 			renderSystem->SetColor(newColor);

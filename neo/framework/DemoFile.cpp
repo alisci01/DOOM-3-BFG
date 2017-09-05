@@ -82,7 +82,6 @@ bool idDemoFile::OpenForReading( const char *fileName ) {
 	static const int magicLen = sizeof(DEMO_MAGIC) / sizeof(DEMO_MAGIC[0]);
 	char magicBuffer[magicLen];
 	int compression;
-	int fileLength;
 
 	Close();
 
@@ -91,7 +90,7 @@ bool idDemoFile::OpenForReading( const char *fileName ) {
 		return false;
 	}
 
-	fileLength = f->Length();
+	size_t fileLength = f->Length();
 
 	if ( com_preloadDemos.GetBool() ) {
 		fileImage = (byte *)Mem_Alloc( fileLength, TAG_CRAP );
@@ -306,8 +305,8 @@ void idDemoFile::WriteDict( const idDict &dict ) {
  idDemoFile::Read
  ================
  */
-int idDemoFile::Read( void *buffer, int len ) {
-	int read = compressor->Read( buffer, len );
+size_t idDemoFile::Read( void *buffer, size_t len ) {
+	size_t read = compressor->Read( buffer, len );
 	if ( read == 0 && len >= 4 ) {
 		*(demoSystem_t *)buffer = DS_FINISHED;
 	}
@@ -319,7 +318,7 @@ int idDemoFile::Read( void *buffer, int len ) {
  idDemoFile::Write
  ================
  */
-int idDemoFile::Write( const void *buffer, int len ) {
+size_t idDemoFile::Write( const void *buffer, size_t len ) {
 	return compressor->Write( buffer, len );
 }
 

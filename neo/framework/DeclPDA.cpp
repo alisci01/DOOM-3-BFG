@@ -63,7 +63,7 @@ void idDeclPDA::List() const {
 idDeclPDA::Parse
 ================
 */
-bool idDeclPDA::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclPDA::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken token;
 
@@ -268,7 +268,7 @@ void idDeclEmail::List() const {
 idDeclEmail::Parse
 ================
 */
-bool idDeclEmail::Parse( const char *_text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclEmail::Parse( const char *_text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken token;
 
@@ -409,7 +409,7 @@ void idDeclVideo::List() const {
 idDeclVideo::Parse
 ================
 */
-bool idDeclVideo::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclVideo::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken token;
 
@@ -531,7 +531,7 @@ void idDeclAudio::List() const {
 idDeclAudio::Parse
 ================
 */
-bool idDeclAudio::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclAudio::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken token;
 

@@ -272,7 +272,7 @@ ID_INLINE const ID_TIME_T idParser::GetFileTime() const {
 	}
 }
 
-const size_t idParser::GetLineNum() const
+ID_INLINE const size_t idParser::GetLineNum() const
 {
 	if ( idParser::scriptstack ) {
 		return idParser::scriptstack->GetLineNum();

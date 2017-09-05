@@ -687,11 +687,16 @@ void idCommonLocal::Frame() {
 			time_gameDraw = 0;
 		}
 
+#if defined( ID_X32 )
 		// the FPU stack better be empty at this point or some bad code or compiler bug left values on the stack
 		if ( !Sys_FPU_StackIsEmpty() ) {
 			Printf( Sys_FPU_GetState() );
 			FatalError( "idCommon::Frame: the FPU stack is not empty at the end of the frame\n" );
 		}
+#else
+		//TODO would this be necessary?
+#pragma message( "common_frame.cpp: Implement support for checking FPU stack at the end of the frame" )
+#endif
 
 		mainFrameTiming = frameTiming;
 

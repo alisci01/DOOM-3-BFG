@@ -29,6 +29,11 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #include "tr_local.h"
 
+// disable pointer truncation warnings; we're saving off 32bit object handles from OpenGL in a genericized void* member, which maybe 64bit
+#pragma warning( disable: 4302 )
+#pragma warning( disable: 4311 )
+#pragma warning( disable: 4312 )
+
 idCVar r_showBuffers( "r_showBuffers", "0", CVAR_INTEGER, "" );
 
 

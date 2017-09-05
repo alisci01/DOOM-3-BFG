@@ -51,19 +51,36 @@ public:
 	}
 	size_t Read( idFile *f ) {
 		size_t sz = f->ReadString( filename );
-		sz += f->ReadBig( offset );
-		sz += f->ReadBig( length );
+
+		//TODO support 64bit resource files
+		int ioffset = -1;
+		sz += f->ReadBig( ioffset );
+		offset = ioffset;
+
+		int ilength = -1;
+		sz += f->ReadBig( ilength );
+		length = ilength;
+
 		return sz;
 	}
 	size_t Write( idFile *f ) {
 		size_t sz = f->WriteString( filename );
-		sz += f->WriteBig( offset );
-		sz += f->WriteBig( length );
+
+		//TODO support 64bit resource files
+		assert( offset <= INT_MAX && offset >= INT_MIN );
+		int ioffset = static_cast<int>( offset );
+		sz += f->WriteBig( ioffset );
+
+		assert( length <= INT_MAX && length >= 0 );
+		int ilength = static_cast<int>( length );
+		sz += f->WriteBig( ilength );
+
 		return sz;
 	}
 	idStrStatic< 256 >	filename;
-	int					offset;							// into the resource file
-	int 				length;
+	//TODO does this need to be signed?
+	ptrdiff_t			offset;							// into the resource file
+	size_t 				length;
 	uint8				containerIndex;
 };
 

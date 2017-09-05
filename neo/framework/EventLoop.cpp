@@ -60,7 +60,7 @@ idEventLoop::GetRealEvent
 =================
 */
 sysEvent_t	idEventLoop::GetRealEvent() {
-	int			r;
+	size_t		r;
 	sysEvent_t	ev;
 
 	// either get an event from the system or the journal file

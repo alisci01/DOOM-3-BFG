@@ -270,8 +270,8 @@ float idRenderModelPrt::DepthHack() const {
 idRenderModelPrt::Memory
 ====================
 */
-int idRenderModelPrt::Memory() const {
-	int total = 0;
+size_t idRenderModelPrt::Memory() const {
+	size_t total = 0;
 
 	total += idRenderModelStatic::Memory();
 

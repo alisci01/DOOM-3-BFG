@@ -66,7 +66,7 @@ idFile * open_file(const char *name, int decompress, int noise_mode)
 {
 	idFile * fp;
 	PathList *plp=pathlist;
-	int l;
+	size_t l;
 
 	if (!name || !(*name))
 	{

@@ -653,7 +653,7 @@ idDeclAF::ContentsFromString
 int idDeclAF::ContentsFromString( const char *str ) {
 	int c;
 	idToken token;
-	idLexer src( str, idStr::Length( str ), "idDeclAF::ContentsFromString" );
+	idLexer src( str, idStr::SizeLength( str ), "idDeclAF::ContentsFromString" );
 
 	c = 0;
 	while( src.ReadToken( &token ) ) {
@@ -1429,7 +1429,7 @@ bool idDeclAF::ParseSettings( idLexer &src ) {
 idDeclAF::Parse
 ================
 */
-bool idDeclAF::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclAF::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	int i, j;
 	idLexer src;
 	idToken token;

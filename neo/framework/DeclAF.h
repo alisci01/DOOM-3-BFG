@@ -146,7 +146,7 @@ public:
 
 	virtual size_t			Size() const;
 	virtual const char *	DefaultDefinition() const;
-	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion );
+	virtual bool			Parse( const char *text, const size_t textLength, bool allowBinaryVersion = false );
 	virtual void			FreeData();
 
 	virtual void			Finish( const getJointTransform_t GetJointTransform, const idJointMat *frame, void *model ) const;

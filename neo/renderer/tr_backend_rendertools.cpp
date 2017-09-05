@@ -721,10 +721,10 @@ static void RB_ShowSilhouette() {
 					continue;
 				}
 
-				qglBindBufferARB( GL_ARRAY_BUFFER_ARB, (GLuint)vertexBuffer.GetAPIObject() );
+				qglBindBufferARB( GL_ARRAY_BUFFER_ARB, reinterpret_cast<uintptr_t>( vertexBuffer.GetAPIObject() ) );
 				int vertOffset = vertexBuffer.GetOffset();
 
-				qglVertexPointer( 3, GL_FLOAT, sizeof( idShadowVert ), (void *)vertOffset );
+				qglVertexPointer( 3, GL_FLOAT, sizeof( idShadowVert ), reinterpret_cast<void *>( static_cast<intptr_t>( vertOffset ) ) );
 				qglBegin( GL_LINES );
 
 				for ( int j = 0; j < tri->numIndexes; j+=3 ) {
@@ -1717,7 +1717,7 @@ float RB_DrawTextLength( const char *text, float scale, int len ) {
 
 	if ( text && *text ) {
 		if ( !len ) {
-			len = strlen(text);
+			len = idStr::Length(text);
 		}
 		for ( i = 0; i < len; i++ ) {
 			charIndex = text[i] - 32;
@@ -1772,7 +1772,7 @@ static void RB_DrawText( const char *text, const idVec3 &origin, float scale, co
 			line = 0;
 		}
 
-		len = strlen( text );
+		len = idStr::Length( text );
 		for ( i = 0; i < len; i++ ) {
 
 			if ( i == 0 || text[i] == '\n' ) {

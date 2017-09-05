@@ -140,9 +140,9 @@ public:
 	virtual const char *	BuildOSPath( const char *base, const char *game, const char *relativePath );
 	virtual const char *	BuildOSPath( const char *base, const char *relativePath );
 	virtual void			CreateOSPath( const char *OSPath );
-	virtual int				ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp );
+	virtual size_t			ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp = NULL );
 	virtual void			FreeFile( void *buffer );
-	virtual int				WriteFile( const char *relativePath, const void *buffer, int size, const char *basePath = "fs_savepath" );
+	virtual size_t			WriteFile( const char *relativePath, const void *buffer, size_t size, const char *basePath = "fs_savepath" );
 	virtual void			RemoveFile( const char *relativePath );	
 	virtual	bool			RemoveDir( const char * relativePath );
 	virtual bool			RenameFile( const char * relativePath, const char * newName, const char * basePath = "fs_savepath" );
@@ -160,11 +160,11 @@ public:
 	virtual void			CopyFile( const char *fromOSPath, const char *toOSPath );
 	virtual findFile_t		FindFile( const char *path );
 	virtual bool			FilenameCompare( const char *s1, const char *s2 ) const;
-	virtual int				GetFileLength( const char * relativePath );
+	virtual size_t			GetFileLength( const char * relativePath );
 	virtual sysFolder_t		IsFolder( const char * relativePath, const char *basePath = "fs_basepath" );
 	// resource tracking
 	virtual void			EnableBackgroundCache( bool enable );
-	virtual void			BeginLevelLoad( const char *name, char *_blockBuffer, int _blockBufferSize );
+	virtual void			BeginLevelLoad( const char *name, char *_blockBuffer, size_t _blockBufferSize );
 	virtual void			EndLevelLoad();
 	virtual bool			InProductionMode() { return ( resourceFiles.Num() > 0 ) |  ( com_productionMode.GetInteger() != 0 ); }
 	virtual bool			UsingResourceFiles() { return resourceFiles.Num() > 0; }
@@ -181,7 +181,7 @@ public:
 	virtual void			StopPreload();
 	idFile *				GetResourceFile( const char *fileName, bool memFile );
 	bool					GetResourceCacheEntry( const char *fileName, idResourceCacheEntry &rc );
-	virtual int				ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, int _len );
+	virtual size_t			ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, size_t _len );
 	virtual bool			IsBinaryModel( const idStr & resName ) const;
 	virtual bool			IsSoundSample( const idStr & resName ) const;
 	virtual void			FreeResourceBuffer() { resourceBufferAvailable = resourceBufferSize; }
@@ -239,8 +239,8 @@ private:
 
 	idList< idResourceContainer * > resourceFiles;
 	byte *	resourceBufferPtr;
-	int		resourceBufferSize;
-	int		resourceBufferAvailable;
+	size_t	resourceBufferSize;
+	size_t	resourceBufferAvailable;
 	int		numFilesOpenedAsCached;
 
 private:
@@ -298,7 +298,7 @@ idFileSystem *		fileSystem = &fileSystemLocal;
 idFileSystemLocal::ReadFromBGL
 ================
 */
-int idFileSystemLocal::ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, int _len ) {
+size_t idFileSystemLocal::ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, size_t _len ) {
 	if ( _resourceFile->Tell() != _offset ) {
 		_resourceFile->Seek( _offset, FS_SEEK_SET );
 	}
@@ -376,9 +376,7 @@ bool idFileSystemLocal::FilenameCompare( const char *s1, const char *s2 ) const 
 idFileSystemLocal::GetFileLength
 ========================
 */
-int idFileSystemLocal::GetFileLength( const char * relativePath ) {
-	idFile *	f;
-	int			len;
+size_t idFileSystemLocal::GetFileLength( const char * relativePath ) {
 
 	if ( !IsInitialized() ) {
 		idLib::FatalError( "Filesystem call made without initialization" );
@@ -386,7 +384,7 @@ int idFileSystemLocal::GetFileLength( const char * relativePath ) {
 
 	if ( !relativePath || !relativePath[0] ) {
 		idLib::Warning( "idFileSystemLocal::GetFileLength with empty name" );
-		return -1;
+		return FILE_INVALID_SIZE;
 	}
 
 	if ( resourceFiles.Num() > 0 ) {
@@ -397,12 +395,12 @@ int idFileSystemLocal::GetFileLength( const char * relativePath ) {
 	}
 
 	// look for it in the filesystem or pack files
-	f = OpenFileRead( relativePath, false );
+	idFile * f = OpenFileRead( relativePath, false );
 	if ( f == NULL ) {
-		return -1;
+		return FILE_INVALID_SIZE;
 	}
 
-	len = (int)f->Length();
+	size_t len = f->Length();
 
 	delete f;
 	return len;
@@ -511,7 +509,7 @@ void idFileSystemLocal::EnableBackgroundCache( bool enable ) {
 idFileSystemLocal::BeginLevelLoad
 =================
 */
-void idFileSystemLocal::BeginLevelLoad( const char *name, char *_blockBuffer, int _blockBufferSize ) {
+void idFileSystemLocal::BeginLevelLoad( const char *name, char *_blockBuffer, size_t _blockBufferSize ) {
 	
 	if ( name == NULL || *name == '\0' ) {
 		return;
@@ -1350,20 +1348,20 @@ void idFileSystemLocal::CopyFile( idFile *src, const char *toOSPath ) {
 
 	common->Printf( "copy %s to %s\n", src->GetName(), toOSPath );
 
-	int len = src->Length();
-	int copied = 0;
+	size_t len = src->Length();
+	size_t copied = 0;
 	while ( copied < len ) {
 		byte buffer[4096];
-		int read = src->Read( buffer, Min( 4096, len - copied ) );
-		if ( read <= 0 ) {
+		size_t read = src->Read( buffer, Min( static_cast<size_t>( 4096 ), len - copied ) );
+		if ( read == FILE_INVALID_SIZE ) {
 			idLib::Warning( "Copy failed during read" );
 			break;
-	}
-		int written = dst->Write( buffer, read );
-		if ( written < read ) {
+		}
+		size_t written = dst->Write( buffer, read );
+		if ( written == FILE_INVALID_SIZE || written < read ) {
 			idLib::Warning( "Copy failed during write" );
 			break;
-	}
+		}
 		copied += written;
 	}
 
@@ -1580,11 +1578,11 @@ a null buffer will just return the file length and time without loading
 timestamp can be NULL if not required
 ============
 */
-int idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp ) {
+size_t idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp /*= NULL */ ) {
 
 	idFile *	f;
 	byte *		buf;
-	int			len;
+	size_t		len;
 	bool		isConfig;
 
 	if ( !IsInitialized() ) {
@@ -1607,7 +1605,7 @@ int idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIM
 
 	if ( buffer == NULL && timestamp != NULL && resourceFiles.Num() > 0 ) {
 		static idResourceCacheEntry rc;
-		int size = 0;
+		size_t size = 0;
 		if ( GetResourceCacheEntry( relativePath, rc ) ) {
 			*timestamp = 0;
 			size = rc.length;
@@ -1622,17 +1620,18 @@ int idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIM
 	if ( strstr( relativePath, ".cfg" ) == relativePath + strlen( relativePath ) - 4 ) {
 		isConfig = true;
 		if ( eventLoop && eventLoop->JournalLevel() == 2 ) {
-			int		r;
+			size_t		r;
 
 			loadCount++;
 			loadStack++;
 
 			common->DPrintf( "Loading %s from journal file.\n", relativePath );
 			len = 0;
-			r = eventLoop->com_journalDataFile->Read( &len, sizeof( len ) );
+			//TODO check here!!
+			r = eventLoop->com_journalDataFile->Read( &len, sizeof( uint32 ) );
 			if ( r != sizeof( len ) ) {
 				*buffer = NULL;
-				return -1;
+				return FILE_INVALID_SIZE;
 			}
 			buf = (byte *)Mem_ClearedAlloc(len+1, TAG_IDFILE);
 			*buffer = buf;
@@ -1656,7 +1655,7 @@ int idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIM
 		if ( buffer ) {
 			*buffer = NULL;
 		}
-		return -1;
+		return FILE_INVALID_SIZE;
 	}
 	len = f->Length();
 
@@ -1684,7 +1683,9 @@ int idFileSystemLocal::ReadFile( const char *relativePath, void **buffer, ID_TIM
 	// if we are journalling and it is a config file, write it to the journal file
 	if ( isConfig && eventLoop && eventLoop->JournalLevel() == 1 ) {
 		common->DPrintf( "Writing %s to journal file.\n", relativePath );
-		eventLoop->com_journalDataFile->Write( &len, sizeof( len ) );
+		//TODO check here!!
+		assert( len <= UINT_MAX );
+		eventLoop->com_journalDataFile->Write( &len, sizeof( uint32 ) );
 		eventLoop->com_journalDataFile->Write( buf, len );
 		eventLoop->com_journalDataFile->Flush();
 	}
@@ -1716,7 +1717,7 @@ idFileSystemLocal::WriteFile
 Filenames are relative to the search path
 ============
 */
-int idFileSystemLocal::WriteFile( const char *relativePath, const void *buffer, int size, const char *basePath ) {
+size_t idFileSystemLocal::WriteFile( const char *relativePath, const void *buffer, size_t size, const char *basePath /*= "fs_savepath" */ ) {
 	idFile *f;
 
 	if ( !IsInitialized() ) {
@@ -1730,7 +1731,7 @@ int idFileSystemLocal::WriteFile( const char *relativePath, const void *buffer, 
 	f = idFileSystemLocal::OpenFileWrite( relativePath, basePath );
 	if ( !f ) {
 		common->Printf( "Failed to open %s\n", relativePath );
-		return -1;
+		return FILE_INVALID_SIZE;
 	}
 
 	size = f->Write( buffer, size );
@@ -1828,7 +1829,7 @@ int idFileSystemLocal::GetFileList( const char *relativePath, const idStrList &e
 		return 0;
 	}
 
-	int pathLength = strlen( relativePath );
+	int pathLength = idStr::Length( relativePath );
 	if ( pathLength ) {
 		pathLength++;	// for the trailing '/'
 	}
@@ -2238,7 +2239,7 @@ void idFileSystemLocal::TouchFileList_f( const idCmdArgs &args ) {
 
 	const char *buffer = NULL;
 	idParser src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-	if ( fileSystem->ReadFile( args.Argv( 1 ), ( void** )&buffer, NULL ) && buffer ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( args.Argv( 1 ), ( void** )&buffer, NULL ) ) && buffer ) {
 		src.LoadMemory( buffer, strlen( buffer ), args.Argv( 1 ) );
 		if ( src.IsLoaded() ) {
 			idToken token;
@@ -2616,7 +2617,7 @@ void idFileSystemLocal::Init() {
 	// busted and error out now, rather than getting an unreadable
 	// graphics screen when the font fails to load
 	// Dedicated servers can run with no outside files at all
-	if ( ReadFile( "default.cfg", NULL, NULL ) <= 0 ) {
+	if ( !IsValidFilesize( ReadFile( "default.cfg", NULL, NULL ) ) ) {
 		common->FatalError( "Couldn't load default.cfg" );
 	}
 }
@@ -2635,7 +2636,7 @@ void idFileSystemLocal::Restart() {
 	// if we can't find default.cfg, assume that the paths are
 	// busted and error out now, rather than getting an unreadable
 	// graphics screen when the font fails to load
-	if ( ReadFile( "default.cfg", NULL, NULL ) <= 0 ) {
+	if ( !IsValidFilesize( ReadFile( "default.cfg", NULL, NULL ) ) ) {
 		common->FatalError( "Couldn't load default.cfg" );
 	}
 }
@@ -2699,9 +2700,10 @@ bool idFileSystemLocal::GetResourceCacheEntry( const char *fileName, idResourceC
 	canonical.ToLower();
 	int idx = resourceFiles.Num() - 1;
 	while ( idx >= 0 ) {
-		const int key = resourceFiles[ idx ]->cacheHash.GenerateKey( canonical, false );
-		for ( int index = resourceFiles[ idx ]->cacheHash.GetFirst( key ); index != idHashIndex::NULL_INDEX; index = resourceFiles[ idx ]->cacheHash.GetNext( index ) ) {
-			idResourceCacheEntry & rt = resourceFiles[ idx ]->cacheTable[ index ];
+		auto resourceFile = resourceFiles[ idx ];
+		const int key = resourceFile->cacheHash.GenerateKey( canonical, false );
+		for ( int index = resourceFile->cacheHash.GetFirst( key ); index != idHashIndex::NULL_INDEX; index = resourceFile->cacheHash.GetNext( index ) ) {
+			idResourceCacheEntry & rt = resourceFile->cacheTable[ index ];
 			if ( idStr::Icmp( rt.filename, canonical ) == 0 ) {
 				rc.filename = rt.filename;
 				rc.length = rt.length;

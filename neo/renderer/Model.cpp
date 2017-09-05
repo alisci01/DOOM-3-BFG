@@ -117,8 +117,8 @@ void idRenderModelStatic::Print() const {
 idRenderModelStatic::Memory
 ==============
 */
-int idRenderModelStatic::Memory() const {
-	int	totalBytes = 0;
+size_t idRenderModelStatic::Memory() const {
+	size_t	totalBytes = 0;
 
 	totalBytes += sizeof( *this );
 	totalBytes += name.DynamicMemoryUsed();
@@ -143,9 +143,8 @@ idRenderModelStatic::List
 void idRenderModelStatic::List() const {
 	int	totalTris = 0;
 	int	totalVerts = 0;
-	int	totalBytes = 0;
 
-	totalBytes = Memory();
+	size_t totalBytes = Memory();
 
 	char	closed = 'C';
 	for ( int j = 0; j < NumSurfaces(); j++ ) {

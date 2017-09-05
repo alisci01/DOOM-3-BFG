@@ -239,15 +239,15 @@ Inputs a long in LSB order to the given file
 nbByte == 1, 2 or 4 (byte, short or long)
 ========================
 */
-int ziplocal_putValue( idFile* filestream, unsigned long x, int nbByte ) {
+int ziplocal_putValue( idFile* filestream, unsigned long x, size_t nbByte ) {
     unsigned char buf[4];
-    for ( int n = 0; n < nbByte; n++ ) {
+    for ( size_t n = 0; n < nbByte; n++ ) {
         buf[n] = (unsigned char)( x & 0xff );
         x >>= 8;
     }
     if ( x != 0 ) {     
 		/* data overflow - hack for ZIP64 (X Roche) */
-		for ( int n = 0; n < nbByte; n++ ) {
+		for ( size_t n = 0; n < nbByte; n++ ) {
           buf[n] = 0xff;
         }
     }

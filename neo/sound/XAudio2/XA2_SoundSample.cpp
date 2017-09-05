@@ -462,7 +462,8 @@ bool idSoundSample_XAudio2::LoadAmplitude( const idStr & name ) {
 	if ( f == NULL ) {
 		return false;
 	}
-	amplitude.SetNum( f->Length() );
+	//TODO write support for size_t in id data structs
+	amplitude.SetNum( static_cast<int>( f->Length() ) );
 	f->Read( amplitude.Ptr(), amplitude.Num() );
 	return true;
 }

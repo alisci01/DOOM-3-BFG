@@ -201,8 +201,10 @@ void idBitMsg::WriteString( const char * s, int maxLength, bool make7Bit ) {
 idBitMsg::WriteData
 ========================
 */
-void idBitMsg::WriteData( const void *data, int length ) {
-	memcpy( GetByteSpace( length ), data, length );
+void idBitMsg::WriteData( const void *data, size_t length ) {
+	//TODO support size_t
+	assert( length <= INT_MAX );
+	memcpy( GetByteSpace( static_cast<int>( length ) ), data, length );
 }
 
 /*
@@ -393,25 +395,30 @@ int idBitMsg::ReadString( idStr & str ) const {
 idBitMsg::ReadData
 ========================
 */
-int idBitMsg::ReadData( void *data, int length ) const {
+size_t idBitMsg::ReadData( void *data, size_t length ) const {
+	//TODO support size_t
+	assert( length <= INT_MAX );
+	int ilength = static_cast<int>( length );
+
 	int cnt;
 
 	ReadByteAlign();
 	cnt = readCount;
 
-	if ( readCount + length > curSize ) {
+	if ( readCount + ilength > curSize ) {
 		if ( data ) {
 			memcpy( data, readData + readCount, GetRemainingData() );
 		}
 		readCount = curSize;
 	} else {
 		if ( data ) {
-			memcpy( data, readData + readCount, length );
+			memcpy( data, readData + readCount, ilength );
 		}
-		readCount += length;
+		readCount += ilength;
 	}
 
-	return ( readCount - cnt );
+	//TODO support size_t
+	return static_cast<size_t>( readCount - cnt );
 }
 
 /*

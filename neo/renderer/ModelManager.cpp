@@ -118,7 +118,7 @@ idRenderModelManagerLocal::ListModels_f
 ==============
 */
 void idRenderModelManagerLocal::ListModels_f( const idCmdArgs &args ) {
-	int		totalMem = 0;
+	size_t	totalMem = 0;
 	int		inUse = 0;
 
 	common->Printf( " mem   srf verts tris\n" );
@@ -691,7 +691,8 @@ idRenderModelManagerLocal::PrintMemInfo
 =================
 */
 void idRenderModelManagerLocal::PrintMemInfo( MemInfo_t *mi ) {
-	int i, j, totalMem = 0;
+	int i, j;
+	size_t totalMem = 0;
 	int *sortIndex;
 	idFile *f;
 
@@ -720,13 +721,12 @@ void idRenderModelManagerLocal::PrintMemInfo( MemInfo_t *mi ) {
 	// print next
 	for ( i = 0; i < localModelManager.models.Num(); i++ ) {
 		idRenderModel	*model = localModelManager.models[sortIndex[i]];
-		int mem;
 
 		if ( !model->IsLoaded() ) {
 			continue;
 		}
 
-		mem = model->Memory();
+		size_t mem = model->Memory();
 		totalMem += mem;
 		f->Printf( "%s %s\n", idStr::FormatNumber( mem ).c_str(), model->Name() );
 	}

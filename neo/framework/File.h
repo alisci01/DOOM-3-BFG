@@ -55,11 +55,11 @@ public:
 							// Get the full file path.
 	virtual const char *	GetFullPath() const;
 							// Read data from the file to the buffer.
-	virtual int				Read( void *buffer, int len );
+	virtual size_t			Read( void *buffer, size_t len );
 							// Write data from the buffer to the file.
-	virtual int				Write( const void *buffer, int len );
+	virtual size_t			Write( const void *buffer, size_t len );
 							// Returns the length of the file.
-	virtual int				Length() const;
+	virtual size_t			Length() const;
 							// Return a time value for reload operations.
 	virtual ID_TIME_T		Timestamp() const;
 							// Returns offset in file.
@@ -73,43 +73,43 @@ public:
 							// Go back to the beginning of the file.
 	virtual void			Rewind();
 							// Like fprintf.
-	virtual int				Printf( VERIFY_FORMAT_STRING const char *fmt, ... );
+	virtual size_t			Printf( VERIFY_FORMAT_STRING const char *fmt, ... );
 							// Like fprintf but with argument pointer
-	virtual int				VPrintf( const char *fmt, va_list arg );
+	virtual size_t			VPrintf( const char *fmt, va_list arg );
 							// Write a string with high precision floating point numbers to the file.
-	virtual int				WriteFloatString( VERIFY_FORMAT_STRING const char *fmt, ... );
+	virtual size_t			WriteFloatString( VERIFY_FORMAT_STRING const char *fmt, ... );
 	
 	// Endian portable alternatives to Read(...)
-	virtual int				ReadInt( int &value );
-	virtual int				ReadUnsignedInt( unsigned int &value );
-	virtual int				ReadShort( short &value );
-	virtual int				ReadUnsignedShort( unsigned short &value );
-	virtual int				ReadChar( char &value );
-	virtual int				ReadUnsignedChar( unsigned char &value );
-	virtual int				ReadFloat( float &value );
-	virtual int				ReadBool( bool &value );
-	virtual int				ReadString( idStr &string );
-	virtual int				ReadVec2( idVec2 &vec );
-	virtual int				ReadVec3( idVec3 &vec );
-	virtual int				ReadVec4( idVec4 &vec );
-	virtual int				ReadVec6( idVec6 &vec );
-	virtual int				ReadMat3( idMat3 &mat );
+	virtual size_t			ReadInt( int &value );
+	virtual size_t			ReadUnsignedInt( unsigned int &value );
+	virtual size_t			ReadShort( short &value );
+	virtual size_t			ReadUnsignedShort( unsigned short &value );
+	virtual size_t			ReadChar( char &value );
+	virtual size_t			ReadUnsignedChar( unsigned char &value );
+	virtual size_t			ReadFloat( float &value );
+	virtual size_t			ReadBool( bool &value );
+	virtual size_t			ReadString( idStr &string );
+	virtual size_t			ReadVec2( idVec2 &vec );
+	virtual size_t			ReadVec3( idVec3 &vec );
+	virtual size_t			ReadVec4( idVec4 &vec );
+	virtual size_t			ReadVec6( idVec6 &vec );
+	virtual size_t			ReadMat3( idMat3 &mat );
 	
 	// Endian portable alternatives to Write(...)
-	virtual int				WriteInt( const int value );
-	virtual int				WriteUnsignedInt( const unsigned int value );
-	virtual int				WriteShort( const short value );
-	virtual int				WriteUnsignedShort( unsigned short value );
-	virtual int				WriteChar( const char value );
-	virtual int				WriteUnsignedChar( const unsigned char value );
-	virtual int				WriteFloat( const float value );
-	virtual int				WriteBool( const bool value );
-	virtual int				WriteString( const char *string );
-	virtual int				WriteVec2( const idVec2 &vec );
-	virtual int				WriteVec3( const idVec3 &vec );
-	virtual int				WriteVec4( const idVec4 &vec );
-	virtual int				WriteVec6( const idVec6 &vec );
-	virtual int				WriteMat3( const idMat3 &mat );
+	virtual size_t			WriteInt( const int value );
+	virtual size_t			WriteUnsignedInt( const unsigned int value );
+	virtual size_t			WriteShort( const short value );
+	virtual size_t			WriteUnsignedShort( unsigned short value );
+	virtual size_t			WriteChar( const char value );
+	virtual size_t			WriteUnsignedChar( const unsigned char value );
+	virtual size_t			WriteFloat( const float value );
+	virtual size_t			WriteBool( const bool value );
+	virtual size_t			WriteString( const char *string );
+	virtual size_t			WriteVec2( const idVec2 &vec );
+	virtual size_t			WriteVec3( const idVec3 &vec );
+	virtual size_t			WriteVec4( const idVec4 &vec );
+	virtual size_t			WriteVec6( const idVec6 &vec );
+	virtual size_t			WriteMat3( const idMat3 &mat );
 
 	template<class type> ID_INLINE size_t ReadBig( type &c ) {
 		size_t r = Read( &c, sizeof( c ) );
@@ -117,7 +117,7 @@ public:
 		return r;
 	}
 
-	template<class type> ID_INLINE size_t ReadBigArray( type *c, int count ) {
+	template<class type> ID_INLINE size_t ReadBigArray( type *c, size_t count ) {
 		size_t r = Read( c, sizeof( c[0] ) * count );
 		idSwap::BigArray( c, count );
 		return r;
@@ -149,15 +149,15 @@ class idFile_Memory : public idFile {
 public:
 							idFile_Memory();	// file for writing without name
 							idFile_Memory( const char *name );	// file for writing
-							idFile_Memory( const char *name, char *data, int length );	// file for writing
-							idFile_Memory( const char *name, const char *data, int length );	// file for reading
+							idFile_Memory( const char *name, char *data, size_t length );	// file for writing
+							idFile_Memory( const char *name, const char *data, size_t length );	// file for reading
 	virtual					~idFile_Memory();
 
 	virtual const char *	GetName() const { return name.c_str(); }
 	virtual const char *	GetFullPath() const { return name.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
+	virtual size_t			Read( void *buffer, size_t len );
+	virtual size_t			Write( const void *buffer, size_t len );
+	virtual size_t			Length() const;
 	virtual void			SetLength( size_t len );
 	virtual ID_TIME_T		Timestamp() const;
 	virtual int				Tell() const;
@@ -215,9 +215,9 @@ public:
 
 	virtual const char *	GetName() const { return name.c_str(); }
 	virtual const char *	GetFullPath() const { return name.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
+	virtual size_t			Read( void *buffer, size_t len );
+	virtual size_t			Write( const void *buffer, size_t len );
+	virtual size_t			Length() const;
 	virtual ID_TIME_T		Timestamp() const;
 	virtual int				Tell() const;
 	virtual void			ForceFlush();
@@ -240,9 +240,9 @@ public:
 
 	virtual const char *	GetName() const { return name.c_str(); }
 	virtual const char *	GetFullPath() const { return fullPath.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
+	virtual size_t			Read( void *buffer, size_t len );
+	virtual size_t			Write( const void *buffer, size_t len );
+	virtual size_t			Length() const;
 	virtual ID_TIME_T		Timestamp() const;
 	virtual int				Tell() const;
 	virtual void			ForceFlush();
@@ -269,7 +269,7 @@ public:
 
 	void					CacheData( uint64 offset, uint64 length );
 
-	virtual int				Read( void *buffer, int len );
+	virtual size_t			Read( void *buffer, size_t len );
 
 	virtual int				Tell() const;
 	virtual int				Seek( long offset, fsOrigin_t origin );
@@ -291,9 +291,9 @@ public:
 
 	virtual const char *	GetName() const { return name.c_str(); }
 	virtual const char *	GetFullPath() const { return fullPath.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len );
-	virtual int				Length() const;
+	virtual size_t			Read( void *buffer, size_t len );
+	virtual size_t			Write( const void *buffer, size_t len );
+	virtual size_t			Length() const;
 	virtual ID_TIME_T		Timestamp() const;
 	virtual int				Tell() const;
 	virtual void			ForceFlush();
@@ -313,14 +313,14 @@ class idFile_InnerResource : public idFile {
 	friend class			idFileSystemLocal;
 
 public:
-							idFile_InnerResource( const char *_name, idFile *rezFile, int _offset, int _len );
+							idFile_InnerResource( const char *_name, idFile *rezFile, ptrdiff_t _offset, size_t _len );
 	virtual					~idFile_InnerResource();
 
 	virtual const char *	GetName() const { return name.c_str(); }
 	virtual const char *	GetFullPath() const { return name.c_str(); }
-	virtual int				Read( void *buffer, int len );
-	virtual int				Write( const void *buffer, int len ) { assert( false ); return 0; }
-	virtual int				Length() const { return length; }
+	virtual size_t			Read( void *buffer, size_t len );
+	virtual size_t			Write( const void *buffer, size_t len ) { assert( false ); return 0; }
+	virtual size_t			Length() const { return length; }
 	virtual ID_TIME_T		Timestamp() const { return 0; }
 	virtual int				Tell() const;
 	virtual int				Seek( long offset, fsOrigin_t origin );
@@ -331,10 +331,10 @@ public:
 
 private:
 	idStr				name;				// name of the file in the pak
-	int					offset;				// offset in the resource file
-	int					length;				// size
+	ptrdiff_t			offset;				// offset in the resource file
+	size_t				length;				// size
 	idFile *			resourceFile;		// actual file
-	int					internalFilePos;	// seek offset
+	ptrdiff_t			internalFilePos;	// seek offset
 	byte *				resourceBuffer;		// if using the temp save memory
 };
 #endif

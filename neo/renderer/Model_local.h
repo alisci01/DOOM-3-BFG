@@ -68,8 +68,8 @@ public:
 	virtual const char *		Name() const;
 	virtual void				Print() const;
 	virtual void				List() const;
-	virtual int					Memory() const;
-	virtual ID_TIME_T				Timestamp() const;
+	virtual size_t				Memory() const;
+	virtual ID_TIME_T			Timestamp() const;
 	virtual int					NumSurfaces() const;
 	virtual int					NumBaseSurfaces() const;
 	virtual const modelSurface_t *Surface( int surfaceNum ) const;
@@ -191,7 +191,7 @@ public:
 	virtual void				TouchData();
 	virtual void				PurgeModel();
 	virtual void				LoadModel();
-	virtual int					Memory() const;
+	virtual size_t				Memory() const;
 	virtual idRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const viewDef_t *view, idRenderModel *cachedModel );
 	virtual int					NumJoints() const;
 	virtual const idMD5Joint *	GetJoints() const;
@@ -315,7 +315,7 @@ public:
 	virtual idRenderModel *		InstantiateDynamicModel( const struct renderEntity_s *ent, const viewDef_t *view, idRenderModel *cachedModel );
 	virtual idBounds			Bounds( const struct renderEntity_s *ent ) const;
 	virtual float				DepthHack() const;
-	virtual int					Memory() const;
+	virtual size_t				Memory() const;
 
 	// with the addModels2 arrangement we could have light accepting and
 	// shadowing dynamic models, but the original game never did

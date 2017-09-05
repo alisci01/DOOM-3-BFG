@@ -2631,7 +2631,7 @@ bool idDeclModelDef::ParseAnim( idLexer &src, int numDefaultAnims ) {
 idDeclModelDef::Parse
 ================
 */
-bool idDeclModelDef::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclModelDef::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	int					i;
 	int					num;
 	idStr				filename;

@@ -335,7 +335,7 @@ void idResourceContainer::ExtractResourceFile ( const char * _fileName, const ch
 		if ( _copyWavs && ( rt.filename.Find( ".idwav" ) >= 0 ||  rt.filename.Find( ".idxma" ) >= 0 ||  rt.filename.Find( ".idmsf" ) >= 0 ) ) {
 			rt.filename.SetFileExtension( "wav" );
 			rt.filename.Replace( "generated/", "" );
-			int len = fileSystem->GetFileLength( rt.filename );
+			size_t len = fileSystem->GetFileLength( rt.filename );
 			fbuf =  (byte *)Mem_Alloc( len, TAG_RESOURCE );
 			fileSystem->ReadFile( rt.filename, (void**)&fbuf, NULL );
 		} else {
@@ -466,7 +466,7 @@ void idResourceContainer::WriteResourceFile( const char *manifestName, const idS
 			delete fm;
 
 			// pacifier every ten megs
-			if ( ( ent.offset + ent.length ) / 10000000 != ent.offset / 10000000 ) {
+			if ( static_cast<ptrdiff_t>( ent.offset + ent.length ) / 10000000 != ent.offset / 10000000 ) {
 				idLib::Printf( "." );
 			}
 		}

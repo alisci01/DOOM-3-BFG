@@ -47,7 +47,7 @@ void idLocalization::ClearDictionary() {
 idLocalization::LoadDictionary
 ========================
 */
-bool idLocalization::LoadDictionary( const byte * data, int dataLen, const char * fileName ) {
+bool idLocalization::LoadDictionary( const byte * data, size_t dataLen, const char * fileName ) {
 	return languageDict.Load( data, dataLen, fileName );
 }
 
@@ -74,9 +74,12 @@ const char * idLocalization::FindString( const char * inString ) {
 idLocalization::VerifyUTF8
 ========================
 */
-utf8Encoding_t idLocalization::VerifyUTF8( const uint8 * buffer, const int bufferLen, const char * name ) {
+utf8Encoding_t idLocalization::VerifyUTF8( const uint8 * buffer, const size_t bufferLen, const char * name ) {
+	//TODO either convert everything to size_t or verify we don't need this assert
+	assert( bufferLen != INVALID_SIZE_T && bufferLen <= INT_MAX );
+
 	utf8Encoding_t encoding;
-	idStr::IsValidUTF8( buffer, bufferLen, encoding );
+	idStr::IsValidUTF8( buffer, static_cast<int>( bufferLen ), encoding );
 	if ( encoding == UTF8_INVALID ) {
 		idLib::FatalError( "Language file %s is not valid UTF-8 or plain ASCII.", name );
 	} else if ( encoding == UTF8_INVALID_BOM ) {
@@ -133,9 +136,9 @@ void idLangDict::Clear() {
 idLangDict::Load
 ========================
 */
-bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *name ) {
+bool idLangDict::Load( const byte * buffer, const size_t bufferLen, const char *name ) {
 
-	if ( buffer == NULL || bufferLen <= 0 ) {
+	if ( buffer == NULL || !IsValidFilesize( bufferLen ) ) {
 		// let whoever called us deal with the failure (so sys_lang can be reset)
 		return false;
 	}
@@ -143,6 +146,10 @@ bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *nam
 	idLib::Printf( "Reading %s", name );
 
 	bool utf8 = false;
+
+	//TODO switch to size_t or verify we don't need this assert
+	assert( bufferLen >= 0 && bufferLen <= INT_MAX );
+	int ibufferLen = static_cast<int>( bufferLen );
 
 	// in all but retail builds, ensure that the byte-order mark is NOT MISSING so that
 	// we can avoid debugging UTF-8 code
@@ -176,10 +183,10 @@ bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *nam
 	int numStrings = 0;
 
 	int i = 0;
-	while ( i < bufferLen ) {
+	while ( i < ibufferLen ) {
 		uint32 c = buffer[i++];
 		if ( c == '/' ) { // comment, read until new line
-			while ( i < bufferLen ) {
+			while ( i < ibufferLen ) {
 				c = buffer[i++];
 				if ( c == '\n' ) {
 					line++;
@@ -193,7 +200,7 @@ bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *nam
 		} else if ( c == '\"' ) {
 			int keyStart = i;
 			int keyEnd = -1;
-			while ( i < bufferLen ) {
+			while ( i < ibufferLen ) {
 				c = buffer[i++];
 				if ( c == '\"' ) {
 					keyEnd = i - 1;
@@ -203,10 +210,10 @@ bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *nam
 			if ( keyEnd < keyStart ) {
 				idLib::FatalError( "%s File ended while reading key at line %d", name, line );
 			}
-			tempKey.CopyRange( (char *)buffer, keyStart, keyEnd );
+			tempKey.CopyRange( reinterpret_cast<const char *>( buffer ), keyStart, keyEnd );
 
 			int valStart = -1;
-			while ( i < bufferLen ) {
+			while ( i < ibufferLen ) {
 				c = buffer[i++];
 				if ( c == '\"' ) {
 					valStart = i;
@@ -218,7 +225,7 @@ bool idLangDict::Load( const byte * buffer, const int bufferLen, const char *nam
 			}
 			int valEnd = -1;
 			tempVal.CapLength( 0 );
-			while ( i < bufferLen ) {
+			while ( i < ibufferLen ) {
 				c = utf8 ? idStr::UTF8Char( buffer, i ) : buffer[i++];
 				if ( !utf8 && c >= 0x80 ) {
 					// this is a serious error and we must check this to avoid accidentally shipping a file where someone squased UTF-8 encodings

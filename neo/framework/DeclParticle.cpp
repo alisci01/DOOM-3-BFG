@@ -425,7 +425,7 @@ idParticleStage *idDeclParticle::ParseParticleStage( idLexer &src ) {
 idDeclParticle::Parse
 ================
 */
-bool idDeclParticle::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclParticle::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 
 	if ( cvarSystem->GetCVarBool( "fs_buildresources" ) ) {
 		fileSystem->AddParticlePreload( GetName() );

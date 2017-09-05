@@ -41,8 +41,8 @@ static idStr FindUnusedFileName( const char *format ) {
 
 	for ( int i = 0 ; i < 999 ; i++ ) {
 		filename.Format( format, i );
-		int len = fileSystem->ReadFile( filename, NULL, NULL );
-		if ( len <= 0 ) {
+		size_t len = fileSystem->ReadFile( filename, NULL, NULL );
+		if ( IsValidFilesize( len ) ) {
 			return filename;	// file doesn't exist
 		}
 	}
@@ -367,7 +367,7 @@ void idCommonLocal::CompressDemoFile( const char *scheme, const char *demoName )
 
 	static const int bufferSize = 65535;
 	char buffer[bufferSize];
-	int bytesRead;
+	size_t bytesRead;
 	while ( 0 != (bytesRead = demoread.Read( buffer, bufferSize ) ) ) {
 		demowrite.Write( buffer, bytesRead );
 		common->Printf( "." );

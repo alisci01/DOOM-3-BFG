@@ -2193,7 +2193,7 @@ idMaterial::Parse
 Parses the current material definition and finds all necessary images.
 =========================
 */
-bool idMaterial::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idMaterial::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer	src;
 	idToken	token;
 	mtrParsingData_t parsingData;

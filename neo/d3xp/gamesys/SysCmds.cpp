@@ -146,7 +146,7 @@ void Cmd_ReloadScript_f( const idCmdArgs &args ) {
 	// recompile the scripts
 	gameLocal.program.Startup( SCRIPT_DEFAULT );
 
-	if ( fileSystem->ReadFile("doom_main.script", NULL) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile("doom_main.script", NULL) ) ) {
 		gameLocal.program.CompileFile( "doom_main.script" );
 		gameLocal.program.FinishCompilation();
 	}
@@ -162,7 +162,7 @@ CONSOLE_COMMAND( reloadScript2, "Doesn't thow an error...  Use this when switchi
 	// recompile the scripts
 	gameLocal.program.Startup( SCRIPT_DEFAULT );
 
-	if ( fileSystem->ReadFile("doom_main.script", NULL) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile("doom_main.script", NULL) ) ) {
 		gameLocal.program.CompileFile( "doom_main.script" );
 		gameLocal.program.FinishCompilation();
 	}

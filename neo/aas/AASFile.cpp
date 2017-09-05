@@ -1204,8 +1204,8 @@ bool idAASFileLocal::Load( const idStr &fileName, unsigned int mapFileCRC ) {
 idAASFileLocal::MemorySize
 ================
 */
-int idAASFileLocal::MemorySize() const {
-	int size;
+size_t idAASFileLocal::MemorySize() const {
+	size_t size;
 
 	size = planeList.Size();
 	size += vertices.Size();

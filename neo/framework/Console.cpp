@@ -225,7 +225,7 @@ float idConsoleLocal::DrawFPS( float y ) {
 		fps = ( fps + 500 ) / 1000;
 
 		const char * s = va( "%ifps", fps );
-		int w = strlen( s ) * BIGCHAR_WIDTH;
+		int w = idStr::Length( s ) * BIGCHAR_WIDTH;
 
 		renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, s, colorWhite, true );
 	}
@@ -909,7 +909,7 @@ void idConsoleLocal::DrawInput() {
 	y = vislines - ( SMALLCHAR_HEIGHT * 2 );
 
 	if ( consoleField.GetAutoCompleteLength() != 0 ) {
-		autoCompleteLength = strlen( consoleField.GetBuffer() ) - consoleField.GetAutoCompleteLength();
+		autoCompleteLength = idStr::Length( consoleField.GetBuffer() ) - consoleField.GetAutoCompleteLength();
 
 		if ( autoCompleteLength > 0 ) {
 			renderSystem->DrawFilled( idVec4( 0.8f, 0.2f, 0.2f, 0.45f ),

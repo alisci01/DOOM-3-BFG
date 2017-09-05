@@ -152,6 +152,8 @@ public:
 
 	char				operator[]( int index ) const;
 	char &				operator[]( int index );
+	char				operator[]( size_t index ) const;
+	char &				operator[]( size_t index );
 
 	void				operator=( const idStr &text );
 	void				operator=( const char *text );
@@ -203,6 +205,7 @@ public:
 	int					IcmpPrefixPath( const char *text ) const;
 
 	int					Length() const;
+	size_t				SizeLength() const;
 	int					Allocated() const;
 	void				Empty();
 	bool				IsEmpty() const;
@@ -232,9 +235,9 @@ public:
 	void					AppendUTF8Char( uint32 c );
 	ID_INLINE void			ConvertToUTF8();
 	static bool				IsValidUTF8( const uint8 * s, const int maxLen, utf8Encoding_t & encoding );
-	static ID_INLINE bool	IsValidUTF8( const char * s, const int maxLen, utf8Encoding_t & encoding ) { return IsValidUTF8( ( const uint8* )s, maxLen, encoding ); }
+	static ID_INLINE bool	IsValidUTF8( const char * s, const int maxLen, utf8Encoding_t & encoding ) { return IsValidUTF8( reinterpret_cast<const uint8*>( s ), maxLen, encoding ); }
 	static ID_INLINE bool	IsValidUTF8( const uint8 * s, const int maxLen );
-	static ID_INLINE bool	IsValidUTF8( const char * s, const int maxLen ) { return IsValidUTF8( ( const uint8* )s, maxLen ); }
+	static ID_INLINE bool	IsValidUTF8( const char * s, const int maxLen ) { return IsValidUTF8( reinterpret_cast<const uint8*>( s ), maxLen ); }
 
 	int					Find( const char c, int start = 0, int end = -1 ) const;
 	int					Find( const char *text, bool casesensitive = true, int start = 0, int end = -1 ) const;
@@ -283,6 +286,7 @@ public:
 
 	// char * methods to replace library functions
 	static int			Length( const char *s );
+	static size_t		SizeLength( const char *s );
 	static char *		ToLower( char *s );
 	static char *		ToUpper( char *s );
 	static bool			IsNumeric( const char *s );
@@ -329,6 +333,7 @@ public:
 	static bool			CharIsTab( char c );
 	static int			ColorIndex( int c );
 	static idVec4 &		ColorForIndex( int i );
+	static idVec4 &		ColorForIndex( size_t i );
 
 	friend int			sprintf( idStr &dest, const char *fmt, ... );
 	friend int			vsprintf( idStr &dest, const char *fmt, va_list ap );
@@ -348,6 +353,7 @@ public:
 
 	int					DynamicMemoryUsed() const;
 	static idStr		FormatNumber( int number );
+	static idStr		FormatNumber( size_t number );
 
 protected:
 	int					len;
@@ -607,6 +613,16 @@ ID_INLINE char &idStr::operator[]( int index ) {
 	return data[ index ];
 }
 
+ID_INLINE char idStr::operator[]( size_t index ) const {
+	assert( ( index >= 0 ) && ( index <= static_cast<size_t>( len ) ) );
+	return data[ index ];
+}
+
+ID_INLINE char &idStr::operator[]( size_t index ) {
+	assert( ( index >= 0 ) && ( index <= static_cast<size_t>( len ) ) );
+	return data[ index ];
+}
+
 ID_INLINE void idStr::operator=( const idStr &text ) {
 	int l;
 
@@ -804,6 +820,10 @@ ID_INLINE int idStr::Length() const {
 	return len;
 }
 
+ID_INLINE size_t idStr::SizeLength() const {
+	return static_cast<size_t>( len );
+}
+
 ID_INLINE int idStr::Allocated() const {
 	if ( data != baseBuffer ) {
 		return GetAlloced();
@@ -994,6 +1014,11 @@ idStr::UTF8Char
 ID_INLINE uint32 idStr::UTF8Char( int & idx ) {
 	return UTF8Char( (byte *)data, idx );
 }
+#if defined( ID_X641 )
+ID_INLINE uint32 idStr::UTF8Char( int & idx ) {
+	return UTF8Char( (byte *)data, idx );
+}
+#endif
 
 /*
 ========================
@@ -1016,6 +1041,20 @@ idStr::UTF8Char
 ID_INLINE uint32 idStr::UTF8Char( const char * s, int & idx ) {
 	return UTF8Char( (byte *)s, idx );
 }
+#if defined( ID_X641 )
+ID_INLINE uint32 idStr::UTF8Char( const byte * s, int & idx ) {
+	size_t refVal = static_cast<int>( idx );
+	uint32 retVal = UTF8Char( s, refVal );
+	idx = static_cast<int>( refVal );
+	return retVal;
+}
+ID_INLINE uint32 idStr::UTF8Char( const char * s, int & idx ) {
+	size_t refVal = static_cast<int>( idx );
+	uint32 retVal = UTF8Char( (byte *)s, refVal );
+	idx = static_cast<int>( refVal );
+	return retVal;
+}
+#endif
 
 /*
 ========================
@@ -1086,6 +1125,10 @@ ID_INLINE int idStr::Length( const char *s ) {
 	int i;
 	for ( i = 0; s[i]; i++ ) {}
 	return i;
+}
+
+ID_INLINE size_t idStr::SizeLength( const char *s ) {
+	return static_cast<size_t>( Length( s ) );
 }
 
 ID_INLINE char *idStr::ToLower( char *s ) {

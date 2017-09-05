@@ -96,7 +96,7 @@ public:
 	virtual void				Reload();
 	virtual void				EnsureNotPurged();
 	virtual int					Index() const;
-	virtual int					GetLineNum() const;
+	virtual size_t				GetLineNum() const;
 	virtual const char *		GetFileName() const;
 	virtual size_t				Size() const;
 	virtual void				GetText( char *text ) const;
@@ -110,7 +110,7 @@ public:
 protected:
 	virtual bool				SetDefaultText();
 	virtual const char *		DefaultDefinition() const;
-	virtual bool				Parse( const char *text, const int textLength, bool allowBinaryVersion );
+	virtual bool				Parse( const char *text, const size_t textLength, bool allowBinaryVersion );
 	virtual void				FreeData();
 	virtual void				List() const;
 	virtual void				Print() const;
@@ -137,9 +137,9 @@ private:
 	int							textLength;				// length of textSource
 	int							compressedLength;		// compressed length
 	idDeclFile *				sourceFile;				// source file in which the decl was defined
-	int							sourceTextOffset;		// offset in source file to decl text
-	int							sourceTextLength;		// length of decl text in source file
-	int							sourceLine;				// this is where the actual declaration token starts
+	size_t						sourceTextOffset;		// offset in source file to decl text
+	size_t						sourceTextLength;		// length of decl text in source file
+	size_t						sourceLine;				// this is where the actual declaration token starts
 	int							checksum;				// checksum of the decl text
 	declType_t					type;					// decl type
 	declState_t					declState;				// decl state
@@ -165,10 +165,10 @@ public:
 	idStr						fileName;
 	declType_t					defaultType;
 
-	ID_TIME_T						timestamp;
+	ID_TIME_T					timestamp;
 	int							checksum;
-	int							fileSize;
-	int							numLines;
+	size_t						fileSize;
+	size_t						numLines;
 
 	idDeclLocal *				decls;
 };
@@ -616,16 +616,16 @@ int idDeclFile::LoadAndParse() {
 	idToken		token;
 	int			startMarker;
 	char *		buffer;
-	int			length, size;
-	int			sourceLine;
+	int			size;
+	size_t		sourceLine;
 	idStr		name;
 	idDeclLocal *newDecl;
 	bool		reparse;
 
 	// load the text
 	common->DPrintf( "...loading '%s'\n", fileName.c_str() );
-	length = fileSystem->ReadFile( fileName, (void **)&buffer, &timestamp );
-	if ( length == -1 ) {
+	size_t length = fileSystem->ReadFile( fileName, (void **)&buffer, &timestamp );
+	if ( length == FILE_INVALID_SIZE ) {
 		common->FatalError( "couldn't load %s", fileName.c_str() );
 		return 0;
 	}
@@ -1623,11 +1623,11 @@ idDeclManagerLocal::ListDecls_f
 void idDeclManagerLocal::ListDecls_f( const idCmdArgs &args ) {
 	int		i, j;
 	int		totalDecls = 0;
-	int		totalText = 0;
-	int		totalStructs = 0;
+	size_t	totalText = 0;
+	size_t	totalStructs = 0;
 
 	for ( i = 0; i < declManagerLocal.declTypes.Num(); i++ ) {
-		int size, num;
+		int num;
 
 		if ( declManagerLocal.declTypes[i] == NULL ) {
 			continue;
@@ -1636,7 +1636,7 @@ void idDeclManagerLocal::ListDecls_f( const idCmdArgs &args ) {
 		num = declManagerLocal.linearLists[i].Num();
 		totalDecls += num;
 
-		size = 0;
+		size_t size = 0;
 		for ( j = 0; j < num; j++ ) {
 			size += declManagerLocal.linearLists[i][j]->Size();
 			if ( declManagerLocal.linearLists[i][j]->self != NULL ) {
@@ -1654,7 +1654,7 @@ void idDeclManagerLocal::ListDecls_f( const idCmdArgs &args ) {
 	}
 
 	common->Printf( "%i total decls is %i decl files\n", totalDecls, declManagerLocal.loadedFiles.Num() );
-	common->Printf( "%iKB in text, %iKB in structures\n", totalText >> 10, totalStructs >> 10 );
+	common->Printf( "%zuKB in text, %iKB in structures\n", totalText >> 10, totalStructs >> 10 );
 }
 
 /*
@@ -2059,7 +2059,7 @@ int idDeclLocal::Index() const {
 idDeclLocal::GetLineNum
 =================
 */
-int idDeclLocal::GetLineNum() const {
+size_t idDeclLocal::GetLineNum() const {
 	return sourceLine;
 }
 
@@ -2150,7 +2150,7 @@ idDeclLocal::ReplaceSourceFileText
 =================
 */
 bool idDeclLocal::ReplaceSourceFileText() {
-	int oldFileLength, newFileLength;
+	size_t oldFileLength, newFileLength;
 	idFile *file;
 
 	common->Printf( "Writing \'%s\' to \'%s\'...\n", GetName(), GetFileName() );
@@ -2228,14 +2228,13 @@ idDeclLocal::SourceFileChanged
 =================
 */
 bool idDeclLocal::SourceFileChanged() const {
-	int newLength;
-	ID_TIME_T newTimestamp;
 
 	if ( sourceFile->fileSize <= 0 ) {
 		return false;
 	}
 
-	newLength = fileSystem->ReadFile( GetFileName(), NULL, &newTimestamp );
+	ID_TIME_T newTimestamp;
+	size_t newLength = fileSystem->ReadFile( GetFileName(), NULL, &newTimestamp );
 
 	if ( newLength != sourceFile->fileSize || newTimestamp != sourceFile->timestamp ) {
 		return true;
@@ -2272,7 +2271,7 @@ void idDeclLocal::MakeDefault() {
 	self->FreeData();
 
 	// parse
-	self->Parse( defaultText, strlen( defaultText ), false );
+	self->Parse( defaultText, idStr::Length( defaultText ), false );
 
 	// we could still eventually hit the recursion if we have enough Error() calls inside Parse...
 	--recursionLevel;
@@ -2301,7 +2300,7 @@ const char *idDeclLocal::DefaultDefinition() const {
 idDeclLocal::Parse
 =================
 */
-bool idDeclLocal::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclLocal::Parse( const char *text, const size_t textLength, bool allowBinaryVersion ) {
 	idLexer src;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );

@@ -160,7 +160,7 @@ idWindow::Size
 */
 size_t idWindow::Size() {
 	int c = children.Num();
-	int sz = 0;
+	size_t sz = 0;
 	for (int i = 0; i < c; i++) {
 		sz += children[i]->Size();
 	}
@@ -175,7 +175,10 @@ idWindow::Allocated
 */
 size_t idWindow::Allocated() {
 	int i, c;
-	int sz = name.Allocated();
+	//TODO verify
+	int nameAllocated = name.Allocated();
+	assert( nameAllocated >= 0 );
+	size_t sz = static_cast<size_t>( nameAllocated );
 	sz += text.Size();
 	sz += backGroundName.Size();
 
@@ -1710,39 +1713,39 @@ void idWindow::PostParse() {
 idWindow::GetWinVarOffset
 ================
 */
-int idWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
-	int ret = -1;
+int idWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner ) {
+	ptrdiff_t ret = -1;
 
 	if ( wv == &rect ) {
-		ret = (int)&( ( idWindow * ) 0 )->rect;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->rect );
 	}
 
 	if ( wv == &backColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->backColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->backColor );
 	}
 
 	if ( wv == &matColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->matColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->matColor );
 	}
 
 	if ( wv == &foreColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->foreColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->foreColor );
 	}
 
 	if ( wv == &hoverColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->hoverColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->hoverColor );
 	}
 
 	if ( wv == &borderColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->borderColor;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->borderColor );
 	}
 
 	if ( wv == &textScale ) {
-		ret = (int)&( ( idWindow * ) 0 )->textScale;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->textScale );
 	}
 
 	if ( wv == &rotate ) {
-		ret = (int)&( ( idWindow * ) 0 )->rotate;
+		ret = reinterpret_cast<ptrdiff_t>( &( ( idWindow * ) 0 )->rotate );
 	}
 
 	if ( ret != -1 ) {
@@ -1761,7 +1764,8 @@ int idWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
 		}
 	}
 
-	return ret;
+	assert( ret >= INT_MIN && ret <= INT_MAX );
+	return static_cast<int>( ret );
 }
 
 /*
@@ -2594,7 +2598,7 @@ int idWindow::ExpressionConstant(float f) {
 idWindow::ExpressionTemporary
 ================
 */
-int idWindow::ExpressionTemporary() {
+ptrdiff_t idWindow::ExpressionTemporary() {
 	if ( expressionRegisters.Num() == MAX_EXPRESSION_REGISTERS ) {
 		common->Warning( "expressionTemporary: gui %s hit MAX_EXPRESSION_REGISTERS", gui->GetSourceFile());
 		return 0;
@@ -2627,7 +2631,7 @@ idWindow::EmitOp
 ================
 */
 
-int idWindow::EmitOp( int a, int b, wexpOpType_t opType, wexpOp_t **opp ) {
+int idWindow::EmitOp( ptrdiff_t a, ptrdiff_t b, wexpOpType_t opType, wexpOp_t **opp ) {
 	wexpOp_t *op;
 /*
 	// optimize away identity operations
@@ -2693,7 +2697,7 @@ Returns a register index
 */
 int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 	idToken token;
-	int		a, b;
+	ptrdiff_t		a, b;
 
 	src->ReadToken( &token );
 
@@ -2736,7 +2740,7 @@ int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 		var = GetWinVarByName(token, true);
 	}
 	if (var) {
-		a = (int)var;
+		a = reinterpret_cast<ptrdiff_t>( var );
 		//assert(dynamic_cast<idWinVec4*>(var));
 		var->Init(token, this);
 		b = component;
@@ -2765,8 +2769,9 @@ int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 	} else {
 		// ugly but used for post parsing to fixup named vars
 		char *p = new (TAG_OLD_UI) char[token.Length()+1];
-		strcpy(p, token);
-		a = (int)p;
+		strcpy( p, token );
+		//TODO verify why we're passing off ptrs to EmitOp when they wouldn't even be used
+		a = reinterpret_cast<ptrdiff_t>( p );
 		b = -2;
 		return EmitOp(a, b, WOP_TYPE_VAR);
 	}
@@ -3266,7 +3271,7 @@ idWindow::WriteString
 ===============
 */
 void idWindow::WriteSaveGameString( const char *string, idFile *savefile ) {
-	int len = strlen( string );
+	int len = idStr::Length( string );
 
 	savefile->Write( &len, sizeof( len ) );
 	savefile->Write( string, len );
@@ -3643,6 +3648,10 @@ int idWindow::NumTransitions() {
 	return c;
 }
 
+//TODO investigate the truncation casts (reinterps from getting ptr offsets to members below)
+#pragma warning( push )
+#pragma warning( disable : 4302 )
+#pragma warning( disable : 4311 )
 
 /*
 ===============
@@ -3657,35 +3666,35 @@ void idWindow::FixupTransitions() {
 		transitions[i].data = NULL;
 		if ( dw != NULL && ( dw->win != NULL || dw->simp != NULL ) ){
 			if ( dw->win != NULL ) {
-				if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->rect ) {
+				if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->rect ) ) {
 					transitions[i].data = &dw->win->rect;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->backColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->backColor ) ) {
 					transitions[i].data = &dw->win->backColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->matColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->matColor ) ) {
 					transitions[i].data = &dw->win->matColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->foreColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->foreColor ) ) {
 					transitions[i].data = &dw->win->foreColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->borderColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->borderColor ) ) {
 					transitions[i].data = &dw->win->borderColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->textScale ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->textScale ) ) {
 					transitions[i].data = &dw->win->textScale;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->rotate ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idWindow * ) 0 )->rotate ) ) {
 					transitions[i].data = &dw->win->rotate;
 				}
 			} else {
-				if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->rect ) {
+				if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->rect ) ) {
 					transitions[i].data = &dw->simp->rect;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->backColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->backColor ) ) {
 					transitions[i].data = &dw->simp->backColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->matColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->matColor ) ) {
 					transitions[i].data = &dw->simp->matColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->foreColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->foreColor ) ) {
 					transitions[i].data = &dw->simp->foreColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->borderColor ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->borderColor ) ) {
 					transitions[i].data = &dw->simp->borderColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->textScale ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->textScale ) ) {
 					transitions[i].data = &dw->simp->textScale;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->rotate ) {
+				} else if ( transitions[i].offset == reinterpret_cast<int>( &( ( idSimpleWindow * ) 0 )->rotate ) ) {
 					transitions[i].data = &dw->simp->rotate;
 				}
 			}
@@ -3701,6 +3710,7 @@ void idWindow::FixupTransitions() {
 	}
 }
 
+#pragma warning( pop )
 
 /*
 ===============
@@ -3745,7 +3755,7 @@ void idWindow::FixupParms() {
 			const char *p = (const char*)(ops[i].a);
 			idWinVar *var = GetWinVarByName(p, true);
 			delete []p;
-			ops[i].a = (int)var;
+			ops[i].a = reinterpret_cast<ptrdiff_t>( var );
 			ops[i].b = -1;
 		}
 	}

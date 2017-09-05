@@ -58,13 +58,12 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 	md3Tag_t			*tag;
 	void				*buffer;
 	int					version;
-	int					size;
 
 
 	name = fileName;
 
-	size = fileSystem->ReadFile( fileName, &buffer, NULL );
-	if (!size || size<0 ) {
+	size_t size = fileSystem->ReadFile( fileName, &buffer, NULL );
+	if ( IsValidFilesize( size ) ) {
 		return;
 	}
 
@@ -79,7 +78,8 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 	}
 
 	size = LittleLong(pinmodel->ofsEnd);
-	dataSize += size;
+	//TODO verify safety of case; LittleLong would always return long so it might be okay
+	dataSize += static_cast<int>( size );
 	md3 = (md3Header_t *)Mem_Alloc( size, TAG_MODEL );
 
 	memcpy (md3, buffer, LittleLong(pinmodel->ofsEnd) );
@@ -151,14 +151,14 @@ void idRenderModelMD3::InitFromFile( const char *fileName ) {
 		surf->ident = 0;	//SF_MD3;
 
 		// lowercase the surface name so skin compares are faster
-		int slen = (int)strlen( surf->name );
+		int slen = idStr::Length( surf->name );
 		for( j = 0; j < slen; j++ ) {
 			surf->name[j] = tolower( surf->name[j] );
 		}
 
 		// strip off a trailing _1 or _2
 		// this is a crutch for q3data being a mess
-		j = strlen( surf->name );
+		j = idStr::Length( surf->name );
 		if ( j > 2 && surf->name[j-2] == '_' ) {
 			surf->name[j-2] = 0;
 		}

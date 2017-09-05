@@ -70,7 +70,10 @@ idStr::ColorForIndex
 ============
 */
 idVec4 & idStr::ColorForIndex( int i ) {
-	return g_color_table[ i & 15 ];
+	return g_color_table[ i & 0xF ];
+}
+idVec4 & idStr::ColorForIndex( size_t i ) {
+	return g_color_table[ i & 0xF ];
 }
 
 /*
@@ -1598,6 +1601,7 @@ bool idStr::IsValidUTF8( const uint8 * s, const int maxLen, utf8Encoding_t & enc
 			return 0;
 		}
 		static bool RemainingCharsAreUTF8FollowingBytes( const uint8 * s, const int curChar, const int maxLen, const int num ) {
+			//TODO verify size_t changes are safe
 			if ( maxLen - curChar < num ) {
 				return false;
 			}
@@ -2072,6 +2076,67 @@ idStr idStr::FormatNumber( int number ) {
 	}
 	else {
 		string += va( "%i", number );
+	}
+
+	// pad to proper size
+	int count = 11 - string.Length();
+
+	for ( int i = 0; i < count; i++ ) {
+		string.Insert( " ", 0 );
+	}
+
+	return string;
+}
+
+idStr idStr::FormatNumber( size_t number ) {
+	idStr string;
+	bool hit;
+
+	// reset
+	for ( int i = 0; i < numFormatList; i++ ) {
+		formatList_t *li = formatList + i;
+		li->count = 0;
+	}
+
+	// main loop
+	do {
+		hit = false;
+
+		for ( int i = 0; i < numFormatList; i++ ) {
+			formatList_t *li = formatList + i;
+
+			assert( li->gran >= 0 );
+			if ( number >= static_cast<size_t>( li->gran ) ) {
+				li->count++;
+				number -= li->gran;
+				hit = true;
+				break;
+			}
+		}
+	} while ( hit );
+
+	// print out
+	bool found = false;
+
+	for ( int i = 0; i < numFormatList; i++ ) {
+		formatList_t *li = formatList + i;
+
+		if ( li->count ) {
+			if ( !found ) {
+				string += va( "%i,", li->count );
+			} else {
+				string += va( "%3.3i,", li->count );
+			}
+			found = true;
+		} else if ( found ) {
+			string += va( "%3.3i,", li->count );
+		}
+	}
+
+	if ( found ) {
+		string += va( "%3.3zu", number );
+	} else {
+		string += va( "%zu", number );
 	}
 
 	// pad to proper size

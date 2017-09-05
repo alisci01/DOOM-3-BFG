@@ -1280,8 +1280,8 @@ void R_ScreenshotFilename( int &lastNumber, const char *base, idStr &fileName ) 
 		if ( lastNumber == 99999 ) {
 			break;
 		}
-		int len = fileSystem->ReadFile( fileName, NULL, NULL );
-		if ( len <= 0 ) {
+		size_t len = fileSystem->ReadFile( fileName, NULL, NULL );
+		if ( !IsValidFilesize( len ) ) {
 			break;
 		}
 		// check again...

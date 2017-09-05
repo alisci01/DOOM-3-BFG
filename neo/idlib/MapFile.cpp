@@ -964,7 +964,7 @@ idMapFile::NeedsReload
 bool idMapFile::NeedsReload() {
 	if ( name.Length() ) {
 		ID_TIME_T time = FILE_NOT_FOUND_TIMESTAMP;
-		if ( idLib::fileSystem->ReadFile( name, NULL, &time ) > 0 ) {
+		if ( IsValidFilesize( idLib::fileSystem->ReadFile( name, NULL, &time ) ) ) {
 			return ( time > fileTime );
 		}
 	}

@@ -99,8 +99,8 @@ public:
 	template<class type> static void LittleArray( type *c, int count ) {
 	}
 
-	template<class type> static void BigArray( type *c, int count ) {
-		for ( int i = 0; i < count; i++ ) {
+	template<class type> static void BigArray( type *c, size_t count ) {
+		for ( size_t i = 0; i < count; i++ ) {
 			Big( c[i] );
 		}
 	}

@@ -53,7 +53,7 @@ void idDeclEntityDef::FreeData() {
 idDeclEntityDef::Parse
 ================
 */
-bool idDeclEntityDef::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idDeclEntityDef::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer src;
 	idToken	token, token2;
 

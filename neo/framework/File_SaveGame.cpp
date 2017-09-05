@@ -623,8 +623,8 @@ Modifies:
 	uncompressedProducedBytes
 ============================
 */
-int idFile_SaveGamePipelined::Write( const void * buffer, int length ) {
-	if ( buffer == NULL || length <= 0 ) {
+size_t idFile_SaveGamePipelined::Write( const void *buffer, size_t len ) {
+	if ( buffer == NULL || len <= 0 ) {
 		return 0;
 	}
 
@@ -638,7 +638,7 @@ int idFile_SaveGamePipelined::Write( const void * buffer, int length ) {
 #endif
 
 	assert( mode == WRITE );
-	size_t lengthRemaining = length;
+	size_t lengthRemaining = len;
 	const byte * buffer_p = (const byte *)buffer;
 	while ( lengthRemaining > 0 ) {
 		const size_t ofsInBuffer = uncompressedProducedBytes & ( UNCOMPRESSED_BUFFER_SIZE - 1 );
@@ -656,7 +656,7 @@ int idFile_SaveGamePipelined::Write( const void * buffer, int length ) {
 			FlushUncompressedBlock();
 		}
 	}
-	return length;
+	return len;
 }
 
 /*
@@ -998,15 +998,15 @@ Modifies:
 	bytesZlib
 ============================
 */
-int idFile_SaveGamePipelined::Read( void * buffer, int length ) {
-	if ( buffer == NULL || length <= 0 ) {
+size_t idFile_SaveGamePipelined::Read( void *buffer, size_t len ) {
+	if ( buffer == NULL || len <= 0 ) {
 		return 0;
 	}
 
 	assert( mode == READ );
 
 	size_t ioCount = 0;
-	size_t lengthRemaining = length;
+	size_t lengthRemaining = len;
 	byte * buffer_p = (byte *)buffer;
 	while ( lengthRemaining > 0 ) {
 		while ( bytesZlib == 0 ) {
@@ -1046,7 +1046,9 @@ static void TestProcessFile( const char * const filename ) {
 	idLib::Printf( "Processing %s:\n", filename );
 	// load some test data
 	void *testData;
-	const int testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	const size_t testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	if ( !IsValidFilesize( testDataLength ) )
+		return;
 
 	const char * const outFileName = "junk/savegameTest.bin";
 	idFile_SaveGamePipelined *saveFile = new (TAG_IDFILE) idFile_SaveGamePipelined;
@@ -1056,12 +1058,12 @@ static void TestProcessFile( const char * const filename ) {
 
 	saveFile->Write( testData, testDataLength );
 	delete saveFile;		// final flush
-	const int readDataLength = fileSystem->GetFileLength( outFileName );
+	const size_t readDataLength = fileSystem->GetFileLength( outFileName );
 
 	const uint64 endWriteMicroseconds = Sys_Microseconds();
 	const uint64 writeMicroseconds = endWriteMicroseconds - startWriteMicroseconds;
 
-	idLib::Printf( "%lld microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n", 
+	idLib::Printf( "%lld microseconds to compress %zu bytes to %zu written bytes = %4.1f MB/s\n", 
 		writeMicroseconds, testDataLength, readDataLength, (float)readDataLength / writeMicroseconds );
 
 	void * readData = (void *)Mem_Alloc( testDataLength, TAG_SAVEGAMES );
@@ -1078,7 +1080,7 @@ static void TestProcessFile( const char * const filename ) {
 
 	idLib::Printf( "%lld microseconds to decompress = %4.1f MB/s\n", readMicroseconds, (float)testDataLength / readMicroseconds );
 
-	int comparePoint;
+	size_t comparePoint;
 	for ( comparePoint = 0; comparePoint < testDataLength; comparePoint++ ) {
 		if ( ((byte *)readData)[comparePoint] != ((byte *)testData)[comparePoint] ) {
 			break;
@@ -1124,7 +1126,9 @@ CONSOLE_COMMAND( TestCompressionSpeeds, "Compares zlib and our code", 0 ) {
 	idLib::Printf( "Processing %s:\n", filename );
 	// load some test data
 	void *testData;
-	const int testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	const size_t testDataLength = fileSystem->ReadFile( filename, &testData, NULL );
+	if ( !IsValidFilesize( testDataLength ) )
+		return;
 
 	const int startWriteMicroseconds = Sys_Microseconds();
 
@@ -1143,7 +1147,7 @@ CONSOLE_COMMAND( TestCompressionSpeeds, "Compares zlib and our code", 0 ) {
 	const int endWriteMicroseconds = Sys_Microseconds();
 	const int writeMicroseconds = endWriteMicroseconds - startWriteMicroseconds;
 
-	idLib::Printf( "%i microseconds to compress %i bytes to %i written bytes = %4.1f MB/s\n", 
+	idLib::Printf( "%i microseconds to compress %zu bytes to %i written bytes = %4.1f MB/s\n", 
 		writeMicroseconds, testDataLength, readDataLength, (float)readDataLength / writeMicroseconds );
 
 }

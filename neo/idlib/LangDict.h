@@ -54,7 +54,7 @@ public:
 	~idLangDict();
 
 	void					Clear();
-	bool					Load( const byte * buffer, const int bufferLen, const char * name );
+	bool					Load( const byte * buffer, const size_t bufferLen, const char * name );
 	bool					Save( const char * fileName );
 
 	const char *			GetString( const char * str ) const;		// returns str if string not found
@@ -99,12 +99,12 @@ public:
 	static const char *		FindString( const char * inString );	// Returns NULL if string not found
 
 	static void				ClearDictionary();
-	static bool				LoadDictionary( const byte * buffer, const int bufferLen, const char * name );
+	static bool				LoadDictionary( const byte * buffer, const size_t bufferLen, const char * name );
 
 	// This is only here for tools, normal code should only ever call GetString
 	static idLangDict &		GetDictionary() { return languageDict; }
 
-	static utf8Encoding_t	VerifyUTF8( const uint8 * buffer, const int bufferLen, const char * name );
+	static utf8Encoding_t	VerifyUTF8( const uint8 * buffer, const size_t bufferLen, const char * name );
 
 private:
 	static idLangDict					languageDict;

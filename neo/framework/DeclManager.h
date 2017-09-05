@@ -110,7 +110,7 @@ public:
 	virtual void			Reload() = 0;
 	virtual void			EnsureNotPurged() = 0;
 	virtual int				Index() const = 0;
-	virtual int				GetLineNum() const = 0;
+	virtual size_t			GetLineNum() const = 0;
 	virtual const char *	GetFileName() const = 0;
 	virtual void			GetText( char *text ) const = 0;
 	virtual int				GetTextLength() const = 0;
@@ -121,7 +121,7 @@ public:
 	virtual bool			EverReferenced() const = 0;
 	virtual bool			SetDefaultText() = 0;
 	virtual const char *	DefaultDefinition() const = 0;
-	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion ) = 0;
+	virtual bool			Parse( const char *text, const size_t textLength, bool allowBinaryVersion ) = 0;
 	virtual void			FreeData() = 0;
 	virtual size_t			Size() const = 0;
 	virtual void			List() const = 0;
@@ -165,7 +165,7 @@ public:
 	int						Index() const { return base->Index(); }
 
 							// Returns the line number the decl starts.
-	int						GetLineNum() const { return base->GetLineNum(); }
+	size_t					GetLineNum() const { return base->GetLineNum(); }
 
 							// Returns the name of the file in which the decl is defined.
 	const char *			GetFileName() const { return base->GetFileName(); }
@@ -211,7 +211,7 @@ public:
 							// The manager will have called FreeData() before issuing a Parse().
 							// The subclass can call MakeDefault() internally at any point if
 							// there are parse errors.
-	virtual bool			Parse( const char *text, const int textLength, bool allowBinaryVersion = false ) { return base->Parse( text, textLength, allowBinaryVersion ); }
+	virtual bool			Parse( const char *text, const size_t textLength, bool allowBinaryVersion = false ) { return base->Parse( text, textLength, allowBinaryVersion ); }
 
 							// Frees any pointers held by the subclass. This may be called before
 							// any Parse(), so the constructor must have set sane values. The decl will be

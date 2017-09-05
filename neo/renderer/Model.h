@@ -217,7 +217,7 @@ public:
 	virtual void				List() const = 0;
 
 	// reports the amount of memory (roughly) consumed by the model
-	virtual int					Memory() const = 0;
+	virtual size_t				Memory() const = 0;
 
 	// for reloadModels
 	virtual ID_TIME_T			Timestamp() const = 0;

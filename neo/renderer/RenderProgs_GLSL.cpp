@@ -936,23 +936,23 @@ GLuint idRenderProgManager::LoadGLSLShader( GLenum target, const char * name, id
 
 	// first check whether we already have a valid GLSL file and compare it to the hlsl timestamp;
 	ID_TIME_T hlslTimeStamp;
-	int hlslFileLength = fileSystem->ReadFile( inFile.c_str(), NULL, &hlslTimeStamp );
+	size_t hlslFileLength = fileSystem->ReadFile( inFile.c_str(), NULL, &hlslTimeStamp );
 
 	ID_TIME_T glslTimeStamp;
-	int glslFileLength = fileSystem->ReadFile( outFileGLSL.c_str(), NULL, &glslTimeStamp );
+	size_t glslFileLength = fileSystem->ReadFile( outFileGLSL.c_str(), NULL, &glslTimeStamp );
 
 	// if the glsl file doesn't exist or we have a newer HLSL file we need to recreate the glsl file.
 	idStr programGLSL;
 	idStr programUniforms;
-	if ( ( glslFileLength <= 0 ) || ( hlslTimeStamp > glslTimeStamp ) ) {
-		if ( hlslFileLength <= 0 ) {
+	if ( !IsValidFilesize( glslFileLength ) || ( hlslTimeStamp > glslTimeStamp ) ) {
+		if ( !IsValidFilesize( hlslFileLength ) ) {
 			// hlsl file doesn't even exist bail out
 			return false;
 		}
 
 		void * hlslFileBuffer = NULL;
-		int len = fileSystem->ReadFile( inFile.c_str(), &hlslFileBuffer );
-		if ( len <= 0 ) {
+		size_t len = fileSystem->ReadFile( inFile.c_str(), &hlslFileBuffer );
+		if ( !IsValidFilesize( len ) ) {
 			return false;
 		}
 		idStr hlslCode( ( const char* ) hlslFileBuffer );
@@ -967,8 +967,8 @@ GLuint idRenderProgManager::LoadGLSLShader( GLenum target, const char * name, id
 	} else {
 		// read in the glsl file
 		void * fileBufferGLSL = NULL;
-		int lengthGLSL = fileSystem->ReadFile( outFileGLSL.c_str(), &fileBufferGLSL );
-		if ( lengthGLSL <= 0 ) {
+		size_t lengthGLSL = fileSystem->ReadFile( outFileGLSL.c_str(), &fileBufferGLSL );
+		if ( !IsValidFilesize( lengthGLSL ) ) {
 			idLib::Error( "GLSL file %s could not be loaded and may be corrupt", outFileGLSL.c_str() );
 		}
 		programGLSL = ( const char * ) fileBufferGLSL;
@@ -977,8 +977,8 @@ GLuint idRenderProgManager::LoadGLSLShader( GLenum target, const char * name, id
 		if ( r_useUniformArrays.GetBool() ) {
 			// read in the uniform file
 			void * fileBufferUniforms = NULL;
-			int lengthUniforms = fileSystem->ReadFile( outFileUniforms.c_str(), &fileBufferUniforms );
-			if ( lengthUniforms <= 0 ) {
+			size_t lengthUniforms = fileSystem->ReadFile( outFileUniforms.c_str(), &fileBufferUniforms );
+			if ( !IsValidFilesize( lengthUniforms ) ) {
 				idLib::Error( "uniform file %s could not be loaded and may be corrupt", outFileUniforms.c_str() );
 			}
 			programUniforms = ( const char* ) fileBufferUniforms;
@@ -990,7 +990,7 @@ GLuint idRenderProgManager::LoadGLSLShader( GLenum target, const char * name, id
 	if ( r_useUniformArrays.GetBool() ) {
 		uniforms.Clear();
 
-		idLexer src( programUniforms, programUniforms.Length(), "uniforms" );
+		idLexer src( programUniforms, programUniforms.Size(), "uniforms" );
 		idToken token;
 		while ( src.ReadToken( &token ) ) {
 			int index = -1;

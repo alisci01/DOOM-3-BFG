@@ -60,10 +60,10 @@ public:
 							// common idFile interface
 	virtual const char *	GetName() = 0;
 	virtual const char *	GetFullPath() = 0;
-	virtual int				Read( void *outData, int outLength ) = 0;
-	virtual int				Write( const void *inData, int inLength ) = 0;
-	virtual int				Length() = 0;
-	virtual ID_TIME_T			Timestamp() = 0;
+	virtual size_t			Read( void *buffer, size_t len ) = 0;
+	virtual size_t			Write( const void *buffer, size_t len ) = 0;
+	virtual size_t			Length() const = 0;
+	virtual ID_TIME_T		Timestamp() = 0;
 	virtual int				Tell() = 0;
 	virtual void			ForceFlush() = 0;
 	virtual void			Flush() = 0;

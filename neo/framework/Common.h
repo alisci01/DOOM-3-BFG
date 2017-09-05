@@ -134,20 +134,20 @@ extern idCVar		com_productionMode;
 struct MemInfo_t {
 	idStr			filebase;
 
-	int				total;
-	int				assetTotals;
+	size_t			total;
+	size_t			assetTotals;
 
 	// memory manager totals
-	int				memoryManagerTotal;
+	size_t			memoryManagerTotal;
 
 	// subsystem totals
-	int				gameSubsystemTotal;
-	int				renderSubsystemTotal;
+	size_t			gameSubsystemTotal;
+	size_t			renderSubsystemTotal;
 
 	// asset totals
-	int				imageAssetsTotal;
-	int				modelAssetsTotal;
-	int				soundAssetsTotal;
+	size_t			imageAssetsTotal;
+	size_t			modelAssetsTotal;
+	size_t			soundAssetsTotal;
 };
 
 struct mpMap_t {

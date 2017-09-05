@@ -104,7 +104,7 @@ idCollisionModelManagerLocal::ContentsFromString
 */
 int idCollisionModelManagerLocal::ContentsFromString( const char *string ) const {
 	int i, contents = 0;
-	idLexer src( string, idStr::Length( string ), "ContentsFromString" );
+	idLexer src( string, idStr::SizeLength( string ), "ContentsFromString" );
 	idToken token;
 
 	while( src.ReadToken( &token ) ) {

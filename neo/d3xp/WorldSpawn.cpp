@@ -73,7 +73,7 @@ void idWorldspawn::Spawn() {
 	// load script
 	scriptname = gameLocal.GetMapName();
 	scriptname.SetFileExtension( ".script" );
-	if ( fileSystem->ReadFile( scriptname, NULL, NULL ) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( scriptname, NULL, NULL ) ) ) {
 		gameLocal.program.CompileFile( scriptname );
 
 		// call the main function by default

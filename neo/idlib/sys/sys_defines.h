@@ -220,12 +220,15 @@ extern volatile int ignoredReturnValue;
 #define ID_X32
 #endif
 
+//TODO use size_t and intptr_t/intptrdiff_t instead
 #if defined( ID_X64 )
 #define ID_PTR_SIZE_TYPE		uint64
 #define ID_PTR_SIGNED_SIZE_TYPE	int64
+#define INVALID_SIZE_T			0xffffffffffffffff
 #elif defined( ID_X32 )
 #define ID_PTR_SIZE_TYPE		uint32
 #define ID_PTR_SIGNED_SIZE_TYPE	int32
+#define INVALID_SIZE_T			0xffffffff
 #endif
 
 #endif

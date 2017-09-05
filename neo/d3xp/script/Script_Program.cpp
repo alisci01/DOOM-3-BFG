@@ -1829,7 +1829,7 @@ void idProgram::CompileFile( const char *filename ) {
 	char *src;
 	bool result;
 
-	if ( fileSystem->ReadFile( filename, ( void ** )&src, NULL ) < 0 ) {
+	if ( !IsValidFilesize( fileSystem->ReadFile( filename, ( void ** )&src, NULL ) ) ) {
 		gameLocal.Error( "Couldn't load %s\n", filename );
 	}
 

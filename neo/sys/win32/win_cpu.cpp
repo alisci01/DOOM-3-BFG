@@ -29,6 +29,12 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 #include "../../idlib/precompiled.h"
 
+#include <immintrin.h>
+
+#if defined( ID_X64 )
+#include <thread>
+#endif
+
 #include "win_local.h"
 
 #pragma warning(disable:4740)	// warning C4740: flow in or out of inline asm code suppresses global optimization
@@ -48,12 +54,12 @@ Sys_GetClockTicks
 ================
 */
 double Sys_GetClockTicks() {
-#if 0
+#if defined( ID_X64 )
 
 	LARGE_INTEGER li;
 
 	QueryPerformanceCounter( &li );
-	return = (double ) li.LowPart + (double) 0xFFFFFFFF * li.HighPart;
+	return (double ) li.LowPart + (double) 0xFFFFFFFF * li.HighPart;
 
 #else
 
@@ -80,7 +86,7 @@ Sys_ClockTicksPerSecond
 */
 double Sys_ClockTicksPerSecond() {
 	static double ticks = 0;
-#if 0
+#if defined( ID_X64 )
 
 	if ( !ticks ) {
 		LARGE_INTEGER li;
@@ -132,6 +138,10 @@ HasCPUID
 ================
 */
 static bool HasCPUID() {
+#if defined( ID_X64 )
+	//TODO write proper impl on 64bit system?
+	return true;
+#else
 	__asm 
 	{
 		pushfd						// save eflags
@@ -161,6 +171,7 @@ err:
 	return false;
 good:
 	return true;
+#endif
 }
 
 #define _REG_EAX		0
@@ -174,6 +185,9 @@ CPUID
 ================
 */
 static void CPUID( int func, unsigned regs[4] ) {
+#if defined( ID_X64 )
+	__cpuid( reinterpret_cast<int *>( regs ), func );
+#else
 	unsigned regEAX, regEBX, regECX, regEDX;
 
 	__asm pusha
@@ -190,6 +204,7 @@ static void CPUID( int func, unsigned regs[4] ) {
 	regs[_REG_EBX] = regEBX;
 	regs[_REG_ECX] = regECX;
 	regs[_REG_EDX] = regEDX;
+#endif
 }
 
 
@@ -337,6 +352,7 @@ static bool HasSSE3() {
 	return false;
 }
 
+#if defined( ID_X32 )
 /*
 ================
 LogicalProcPerPhysicalProc
@@ -354,6 +370,7 @@ static unsigned char LogicalProcPerPhysicalProc() {
 	}
 	return (unsigned char) ((regebx & NUM_LOGICAL_BITS) >> 16);
 }
+#endif
 
 /*
 ================
@@ -365,11 +382,17 @@ GetAPIC_ID
                                           // Default value = 0xff if HT is not supported
 static unsigned char GetAPIC_ID() {
 	unsigned int regebx = 0;
+#if defined( ID_X64 )
+	uint32 regs[ 4 ];
+	CPUID( 1, regs );
+	regebx = regs[ 1 ];
+#else
 	__asm {
 		mov eax, 1
 		cpuid
 		mov regebx, ebx
 	}
+#endif
 	return (unsigned char) ((regebx & INITIAL_APIC_ID_BITS) >> 24);
 }
 
@@ -405,12 +428,21 @@ int CPUCount( int &logicalNum, int &physicalNum ) {
 
 	unsigned char HT_Enabled = 0;
 
+#if defined( ID_X64 )
+	logicalNum = std::thread::hardware_concurrency() / physicalNum;
+#else
 	logicalNum = LogicalProcPerPhysicalProc();
+#endif
 
 	if ( logicalNum >= 1 ) {	// > 1 doesn't mean HT is enabled in the BIOS
 		HANDLE hCurrentProcessHandle;
+#if defined( ID_X64 )
+		DWORD_PTR  dwProcessAffinity;
+		DWORD_PTR  dwSystemAffinity;
+#else
 		DWORD  dwProcessAffinity;
 		DWORD  dwSystemAffinity;
+#endif
 		DWORD  dwAffinityMask;
 
 		// Calculate the appropriate  shifts and mask based on the 
@@ -500,7 +532,7 @@ static bool HasHTT() {
 
 /*
 ================
-HasHTT
+HasDAZ
 ================
 */
 static bool HasDAZ() {
@@ -519,10 +551,12 @@ static bool HasDAZ() {
 
 	memset( FXArea, 0, sizeof( FXSaveArea ) );
 
-	__asm {
+	_fxsave( FXArea );
+
+	/*__asm {
 		mov		eax, FXArea
 		FXSAVE	[eax]
-	}
+	}*/
 
 	dwMask = *(DWORD *)&FXArea[28];						// Read the MXCSR Mask
 	return ( ( dwMask & ( 1 << 6 ) ) == ( 1 << 6 ) );	// Return if the DAZ bit is set
@@ -856,6 +890,10 @@ Sys_FPU_StackIsEmpty
 ===============
 */
 bool Sys_FPU_StackIsEmpty() {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+	return false;
+#else
 	__asm {
 		mov			eax, statePtr
 		fnstenv		[eax]
@@ -867,6 +905,7 @@ bool Sys_FPU_StackIsEmpty() {
 	return false;
 empty:
 	return true;
+#endif
 }
 
 /*
@@ -875,6 +914,9 @@ Sys_FPU_ClearStack
 ===============
 */
 void Sys_FPU_ClearStack() {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+#else
 	__asm {
 		mov			eax, statePtr
 		fnstenv		[eax]
@@ -890,6 +932,7 @@ void Sys_FPU_ClearStack() {
 		jmp			emptyStack
 	done:
 	}
+#endif
 }
 
 /*
@@ -900,6 +943,10 @@ Sys_FPU_GetState
 ===============
 */
 const char *Sys_FPU_GetState() {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+	return nullptr;
+#else
 	double fpuStack[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	double *fpuStackPtr = fpuStack;
 	int i, numValues;
@@ -996,6 +1043,7 @@ const char *Sys_FPU_GetState() {
 	Sys_FPU_PrintStateFlags( ptr, ctrl, stat, tags, inof, inse, opof, opse );
 
 	return fpuString;
+#endif
 }
 
 /*
@@ -1004,6 +1052,9 @@ Sys_FPU_EnableExceptions
 ===============
 */
 void Sys_FPU_EnableExceptions( int exceptions ) {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+#else
 	__asm {
 		mov			eax, statePtr
 		mov			ecx, exceptions
@@ -1016,6 +1067,7 @@ void Sys_FPU_EnableExceptions( int exceptions ) {
 		mov			word ptr [eax], bx
 		fldcw		word ptr [eax]
 	}
+#endif
 }
 
 /*
@@ -1024,6 +1076,9 @@ Sys_FPU_SetPrecision
 ===============
 */
 void Sys_FPU_SetPrecision( int precision ) {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+#else
 	short precisionBitTable[4] = { 0, 1, 3, 0 };
 	short precisionBits = precisionBitTable[precision & 3] << 8;
 	short precisionMask = ~( ( 1 << 9 ) | ( 1 << 8 ) );
@@ -1038,6 +1093,7 @@ void Sys_FPU_SetPrecision( int precision ) {
 		mov			word ptr [eax], bx
 		fldcw		word ptr [eax]
 	}
+#endif
 }
 
 /*
@@ -1046,6 +1102,9 @@ Sys_FPU_SetRounding
 ================
 */
 void Sys_FPU_SetRounding( int rounding ) {
+#if defined( ID_X64 )
+	assert( false && "currently unsupported on this platform" );
+#else
 	short roundingBitTable[4] = { 0, 1, 2, 3 };
 	short roundingBits = roundingBitTable[rounding & 3] << 10;
 	short roundingMask = ~( ( 1 << 11 ) | ( 1 << 10 ) );
@@ -1060,6 +1119,7 @@ void Sys_FPU_SetRounding( int rounding ) {
 		mov			word ptr [eax], bx
 		fldcw		word ptr [eax]
 	}
+#endif
 }
 
 /*
@@ -1068,6 +1128,9 @@ Sys_FPU_SetDAZ
 ================
 */
 void Sys_FPU_SetDAZ( bool enable ) {
+#if defined( ID_X64 )
+	_MM_SET_DENORMALS_ZERO_MODE( enable ? _MM_DENORMALS_ZERO_ON : _MM_DENORMALS_ZERO_OFF );
+#else
 	DWORD dwData;
 
 	_asm {
@@ -1081,6 +1144,7 @@ void Sys_FPU_SetDAZ( bool enable ) {
 		mov		dwData, eax
 		LDMXCSR	dword ptr dwData
 	}
+#endif
 }
 
 /*
@@ -1089,6 +1153,9 @@ Sys_FPU_SetFTZ
 ================
 */
 void Sys_FPU_SetFTZ( bool enable ) {
+#if defined( ID_X64 )
+	_MM_SET_FLUSH_ZERO_MODE( enable ? _MM_FLUSH_ZERO_ON : _MM_FLUSH_ZERO_OFF );
+#else
 	DWORD dwData;
 
 	_asm {
@@ -1102,4 +1169,5 @@ void Sys_FPU_SetFTZ( bool enable ) {
 		mov		dwData, eax
 		LDMXCSR	dword ptr dwData
 	}
+#endif
 }

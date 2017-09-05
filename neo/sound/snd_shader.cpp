@@ -132,7 +132,7 @@ idSoundShader::Parse
   this is called by the declManager
 ===============
 */
-bool idSoundShader::Parse( const char *text, const int textLength, bool allowBinaryVersion ) {
+bool idSoundShader::Parse( const char *text, const size_t textLength, bool allowBinaryVersion /*= false */ ) {
 	idLexer	src;
 
 	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );

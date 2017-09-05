@@ -900,10 +900,10 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 
 		float imageSkip = 0.0f;
 
-		if ( charIndex - 1 == iconCheck.startIndex ) {
+		if ( ( charIndex - 1 ) == iconCheck.startIndex ) {
 			insertingImage = true;
 			imageSkip = iconCheck.imageWidth * imageScale;
-		} else if ( charIndex - 1 == iconCheck.endIndex ) {
+		} else if ( ( charIndex - 1 ) == iconCheck.endIndex ) {
 			insertingImage = false;
 			iconIndex++;
 			glyphSkip = 0.0f;
@@ -1177,7 +1177,7 @@ void idSWF::RenderEditText( idRenderSystem * gui, idSWFTextInstance * textInstan
 		insertingImage = false;
 		int i = 0;
 		while ( i < lastChar ) {
-			if ( curIcon < tooltipIconList.Num() && tooltipIconList[curIcon].startIndex == startCharacter + i ) {
+			if ( curIcon < tooltipIconList.Num() && tooltipIconList[curIcon].startIndex == ( startCharacter + i ) ) {
 				width += tooltipIconList[curIcon].imageWidth * imageScale;
 				i += tooltipIconList[curIcon].endIndex - tooltipIconList[curIcon].startIndex - 1;
 				curIcon++;

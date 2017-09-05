@@ -50,8 +50,9 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
+static const size_t		FILE_INVALID_SIZE			= static_cast<size_t>( -1 );
 static const ID_TIME_T	FILE_NOT_FOUND_TIMESTAMP	= (ID_TIME_T)-1;
-static const int		MAX_OSPATH					= 256;
+static const int		MAX_OSPATH = 256;
 
 // modes for OpenFileByMode
 typedef enum {
@@ -119,12 +120,12 @@ public:
 							// As a quick check for existance. -1 length == not present.
 							// A 0 byte will always be appended at the end, so string ops are safe.
 							// The buffer should be considered read-only, because it may be cached for other uses.
-	virtual int				ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp = NULL ) = 0;
+	virtual size_t			ReadFile( const char *relativePath, void **buffer, ID_TIME_T *timestamp = NULL ) = 0;
 							// Frees the memory allocated by ReadFile.
 	virtual void			FreeFile( void *buffer ) = 0;
 							// Writes a complete file, will create any needed subdirectories.
 							// Returns the length of the file, or -1 on failure.
-	virtual int				WriteFile( const char *relativePath, const void *buffer, int size, const char *basePath = "fs_savepath" ) = 0;
+	virtual size_t			WriteFile( const char *relativePath, const void *buffer, size_t size, const char *basePath = "fs_savepath" ) = 0;
 							// Removes the given file.
 	virtual void			RemoveFile( const char *relativePath ) = 0;
 							// Removes the specified directory.
@@ -173,13 +174,13 @@ public:
 	}
 	
 	// Returns length of file, -1 if no file exists
-	virtual int				GetFileLength( const char * relativePath ) = 0;
+	virtual size_t			GetFileLength( const char * relativePath ) = 0;
 
 	virtual sysFolder_t		IsFolder( const char * relativePath, const char *basePath = "fs_basepath" ) = 0;
 
 	// resource tracking and related things
 	virtual void			EnableBackgroundCache( bool enable ) = 0;
-	virtual void			BeginLevelLoad( const char *name, char *_blockBuffer, int _blockBufferSize  ) = 0;
+	virtual void			BeginLevelLoad( const char *name, char *_blockBuffer, size_t _blockBufferSize  ) = 0;
 	virtual void			EndLevelLoad() = 0;
 	virtual bool			InProductionMode() = 0;
 	virtual bool			UsingResourceFiles() = 0;
@@ -187,7 +188,7 @@ public:
 	virtual void			UnloadResourceContainer( const char *name ) = 0;
 	virtual void			StartPreload( const idStrList &_preload ) = 0;
 	virtual void			StopPreload() = 0;
-	virtual int				ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, int _len ) = 0;
+	virtual size_t			ReadFromBGL( idFile *_resourceFile, void * _buffer, int _offset, size_t _len ) = 0;
 	virtual bool			IsBinaryModel( const idStr & resName ) const = 0;
 	virtual bool			IsSoundSample( const idStr & resName ) const = 0;
 	virtual bool			GetResourceCacheEntry( const char *fileName, idResourceCacheEntry &rc ) = 0;
@@ -202,5 +203,9 @@ public:
 };
 
 extern idFileSystem *		fileSystem;
+
+ID_INLINE bool IsValidFilesize( size_t fileSize ) {
+	return fileSize != FILE_INVALID_SIZE && fileSize > 0;
+}
 
 #endif /* !__FILESYSTEM_H__ */

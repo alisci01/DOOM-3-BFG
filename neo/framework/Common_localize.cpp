@@ -45,7 +45,7 @@ void LoadMapLocalizeData(ListHash& listHash) {
 	const char *buffer = NULL;
 	idLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( fileName, (void**)&buffer ) ) ) {
 		src.LoadMemory( buffer, strlen(buffer), fileName );
 		if ( src.IsLoaded() ) {
 			idStr classname;
@@ -79,7 +79,7 @@ void LoadGuiParmExcludeList(idStrList& list) {
 	const char *buffer = NULL;
 	idLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( fileName, (void**)&buffer ) ) ) {
 		src.LoadMemory( buffer, strlen(buffer), fileName );
 		if ( src.IsLoaded() ) {
 			idStr classname;
@@ -275,8 +275,8 @@ CONSOLE_COMMAND( localizeMaps, "localize maps", NULL ) {
 	{
 		// I think this is equivalent...
 		const byte * buffer = NULL;
-		int len = fileSystem->ReadFile( filename, (void**)&buffer );
-		if ( verify( len > 0 ) ) {
+		size_t len = fileSystem->ReadFile( filename, (void**)&buffer );
+		if ( verify( IsValidFilesize( len ) ) ) {
 			strTable.Load( buffer, len, filename );
 		}
 		fileSystem->FreeFile( (void *)buffer );
@@ -337,8 +337,8 @@ CONSOLE_COMMAND( localizeGuis, "localize guis", NULL ) {
 	{
 		// I think this is equivalent...
 		const byte * buffer = NULL;
-		int len = fileSystem->ReadFile( filename, (void**)&buffer );
-		if ( verify( len > 0 ) ) {
+		size_t len = fileSystem->ReadFile( filename, (void**)&buffer );
+		if ( verify( IsValidFilesize( len ) ) ) {
 			strTable.Load( buffer, len, filename );
 		}
 		fileSystem->FreeFile( (void *)buffer );
@@ -551,7 +551,7 @@ void idCommonLocal::LocalizeMapData( const char *fileName, idLangDict &langDict 
 
 	common->SetRefreshOnPrint( true );
 
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( fileName, (void**)&buffer ) ) ) {
 		src.LoadMemory( buffer, strlen(buffer), fileName );
 		if ( src.IsLoaded() ) {
 			common->Printf( "Processing %s\n", fileName );
@@ -598,7 +598,7 @@ void idCommonLocal::LocalizeGui( const char *fileName, idLangDict &langDict ) {
 	char tab = 't';
 	char nl = 'n';
 	idLexer src( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_ALLOWMULTICHARLITERALS | LEXFL_ALLOWBACKSLASHSTRINGCONCAT );
-	if ( fileSystem->ReadFile( fileName, (void**)&buffer ) > 0 ) {
+	if ( IsValidFilesize( fileSystem->ReadFile( fileName, (void**)&buffer ) ) ) {
 		src.LoadMemory( buffer, strlen(buffer), fileName );
 		if ( src.IsLoaded() ) {
 			idFile *outFile = fileSystem->OpenFileWrite( fileName ); 

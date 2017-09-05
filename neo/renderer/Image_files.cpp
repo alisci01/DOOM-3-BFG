@@ -145,7 +145,7 @@ LoadTGA
 =============
 */
 static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_TIME_T *timestamp ) {
-	int		columns, rows, numPixels, fileSize, numBytes;
+	int		columns, rows, numPixels, numBytes;
 	byte	*pixbuf;
 	int		row, column;
 	byte	*buf_p;
@@ -163,7 +163,7 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 	//
 	// load the file
 	//
-	fileSize = fileSystem->ReadFile( name, (void **)&buffer, timestamp );
+	size_t fileSize = fileSystem->ReadFile( name, (void **)&buffer, timestamp );
 	if ( !buffer ) {
 		return;
 	}
@@ -204,7 +204,7 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 
 	if ( targa_header.image_type == 2 || targa_header.image_type == 3 ) {
 		numBytes = targa_header.width * targa_header.height * ( targa_header.pixel_size >> 3 );
-		if ( numBytes > fileSize - 18 - targa_header.id_length ) {
+		if ( static_cast<size_t>( numBytes ) > fileSize - 18 - targa_header.id_length ) {
 			common->Error( "LoadTGA( %s ): incomplete file\n", name );
 		}
 	}
@@ -429,14 +429,13 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 	*pic = NULL;		// until proven otherwise
   }
   {
-		int		len;
 		idFile *f;
 
 		f = fileSystem->OpenFileRead( filename );
 		if ( !f ) {
 			return;
 		}
-		len = f->Length();
+		size_t len = f->Length();
 		if ( timestamp ) {
 			*timestamp = f->Timestamp();
 		}

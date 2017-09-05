@@ -653,10 +653,10 @@ void idCommonLocal::FilterLangList( idStrList* list, idStr lang ) {
 	idStr temp;
 	for( int i = 0; i < list->Num(); i++ ) {
 		temp = (*list)[i];
-		temp = temp.Right(temp.Length()-strlen("strings/"));
-		temp = temp.Left(lang.Length());
-		if(idStr::Icmp(temp, lang) != 0) {
-			list->RemoveIndex(i);
+		temp = temp.Right( temp.Length() - idStr::Length( "strings/" ) );
+		temp = temp.Left( lang.Length() );
+		if ( idStr::Icmp( temp, lang ) != 0 ) {
+			list->RemoveIndex( i );
 			i--;
 		}
 	}
@@ -695,8 +695,8 @@ void idCommonLocal::InitLanguageDict() {
 	for( int i = 0; i < currentLangList.Num(); i++ ) {
 		//common->Printf("%s\n", currentLangList[i].c_str());
 		const byte * buffer = NULL;
-		int len = fileSystem->ReadFile( currentLangList[i], (void**)&buffer );
-		if ( len <= 0 ) {
+		size_t len = fileSystem->ReadFile( currentLangList[i], (void**)&buffer );
+		if ( !IsValidFilesize( len ) ) {
 			assert( false && "couldn't read the language dict file" );
 			break;
 		}

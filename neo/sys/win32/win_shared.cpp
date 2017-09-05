@@ -300,13 +300,13 @@ const int UNDECORATE_FLAGS =	UNDNAME_NO_MS_KEYWORDS |
 #if defined(_DEBUG) && 1
 
 typedef struct symbol_s {
-	int					address;
+	ptrdiff_t			address;
 	char *				name;
 	struct symbol_s *	next;
 } symbol_t;
 
 typedef struct module_s {
-	int					address;
+	ptrdiff_t			address;
 	char *				name;
 	symbol_t *			symbols;
 	struct module_s *	next;
@@ -363,11 +363,11 @@ int ParseHexNumber( const char **ptr ) {
 Sym_Init
 ==================
 */
-void Sym_Init( long addr ) {
+void Sym_Init( ptrdiff_t addr ) {
 	TCHAR moduleName[MAX_STRING_CHARS];
 	MEMORY_BASIC_INFORMATION mbi;
 
-	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
+	VirtualQuery( reinterpret_cast<void *>( addr ), &mbi, sizeof(mbi) );
 
 	GetModuleFileName( (HMODULE)mbi.AllocationBase, moduleName, sizeof( moduleName ) );
 
@@ -384,7 +384,7 @@ void Sym_Init( long addr ) {
 	module_t *module = (module_t *) malloc( sizeof( module_t ) );
 	module->name = (char *) malloc( strlen( moduleName ) + 1 );
 	strcpy( module->name, moduleName );
-	module->address = (int)mbi.AllocationBase;
+	module->address = reinterpret_cast<ptrdiff_t>( mbi.AllocationBase );
 	module->symbols = NULL;
 	module->next = modules;
 	modules = module;
@@ -491,15 +491,15 @@ void Sym_Shutdown() {
 Sym_GetFuncInfo
 ==================
 */
-void Sym_GetFuncInfo( long addr, idStr &module, idStr &funcName ) {
+void Sym_GetFuncInfo( ptrdiff_t addr, idStr &module, idStr &funcName ) {
 	MEMORY_BASIC_INFORMATION mbi;
 	module_t *m;
 	symbol_t *s;
 
-	VirtualQuery( (void*)addr, &mbi, sizeof(mbi) );
+	VirtualQuery( reinterpret_cast<void *>( addr ), &mbi, sizeof(mbi) );
 
 	for ( m = modules; m != NULL; m = m->next ) {
-		if ( m->address == (int) mbi.AllocationBase ) {
+		if ( m->address == reinterpret_cast<ptrdiff_t>( mbi.AllocationBase ) ) {
 			break;
 		}
 	}
@@ -528,7 +528,7 @@ void Sym_GetFuncInfo( long addr, idStr &module, idStr &funcName ) {
 		}
 	}
 
-	sprintf( funcName, "0x%08x", addr );
+	sprintf( funcName, "0x%08tx", addr );
 	module = "";
 }
 
@@ -664,6 +664,7 @@ void Sym_GetFuncInfo( long addr, idStr &module, idStr &funcName ) {
 
 #endif
 
+#if defined( ID_X32 )
 /*
 ==================
 GetFuncAddr
@@ -673,7 +674,7 @@ address_t GetFuncAddr( address_t midPtPtr ) {
 	long temp;
 	do {
 		temp = (long)(*(long*)midPtPtr);
-		if ( (temp&0x00FFFFFF) == PROLOGUE_SIGNATURE ) {
+		if ( (temp & 0x00FFFFFF) == PROLOGUE_SIGNATURE ) {
 			break;
 		}
 		midPtPtr--;
@@ -705,6 +706,7 @@ address_t GetCallerAddr( long _ebp ) {
 label:
 	return res;
 }
+#endif
 
 /*
 ==================
@@ -714,7 +716,7 @@ Sys_GetCallStack
 ==================
 */
 void Sys_GetCallStack( address_t *callStack, const int callStackSize ) {
-#if 1 //def _DEBUG
+#if defined( ID_X32 )
 	int i;
 	long m_ebp;
 
@@ -787,7 +789,7 @@ const char *Sys_GetCallStackCurAddressStr( int depth ) {
 
 	index = 0;
 	for ( i = depth-1; i >= 0; i-- ) {
-		index += sprintf( string+index, " -> 0x%08x", callStack[i] );
+		index += sprintf( string+index, " -> 0x%08tx", callStack[i] );
 	}
 	return string;
 }
