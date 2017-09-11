@@ -1522,6 +1522,16 @@ idVarDef *idCompiler::GetExpression( int priority ) {
 				if ( ( statement.op >= OP_INDIRECT_F ) && ( statement.op < OP_ADDRESS ) ) {
 					statement.op = OP_ADDRESS;
 					type_pointer.SetPointerType( e->TypeDef() );
+
+					//TODO cleanup ptr size compensation (does this belong here?)
+					assert( statement.c->initialized == idVarDef::stackVariable );
+					if ( statement.c->initialized == idVarDef::stackVariable && ( e->Type() == ev_float || e->Type() == ev_boolean ) ) {
+						assert( statement.c->scope->Type() == ev_function );
+						int ptrSizeDiff = sizeof( void * ) - e->TypeDef()->Size();
+						assert( ptrSizeDiff >= 0 );
+						statement.c->scope->value.functionPtr->locals += ptrSizeDiff;
+					}
+
 					e->SetTypeDef( &type_pointer );
 				}
 			}

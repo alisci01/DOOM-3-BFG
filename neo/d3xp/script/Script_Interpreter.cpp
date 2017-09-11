@@ -542,7 +542,7 @@ void idInterpreter::EnterObjectFunction( idEntity *self, const function_t *func,
 		PopParms( popParms );
 		popParms = 0;
 	}
-	Push( self->entityNumber + 1 );
+	PushSize( self->entityNumber + 1 );
 	EnterFunction( func, false );
 }
 
@@ -614,6 +614,7 @@ void idInterpreter::EnterFunction( const function_t *func, bool clearStack ) {
 
 	localstackUsed += c;
 	localstackBase = localstackUsed - func->locals;
+	assert( localstackBase >= 0 );
 
 	if ( localstackUsed > maxLocalstackUsed ) {
 		maxLocalstackUsed = localstackUsed ;
@@ -1806,7 +1807,7 @@ bool idInterpreter::Execute() {
 
 		case OP_PUSH_ENT:
 			var_a = GetVariable( st->a );
-			Push( *var_a.entityNumberPtr );
+			PushSize( *var_a.entityNumberPtr );
 			break;
 
 		case OP_PUSH_S:
@@ -1822,12 +1823,12 @@ bool idInterpreter::Execute() {
 
 		case OP_PUSH_OBJ:
 			var_a = GetVariable( st->a );
-			Push( *var_a.entityNumberPtr );
+			PushSize( *var_a.entityNumberPtr );
 			break;
 
 		case OP_PUSH_OBJENT:
 			var_a = GetVariable( st->a );
-			Push( *var_a.entityNumberPtr );
+			PushSize( *var_a.entityNumberPtr );
 			break;
 
 		case OP_BREAK:
