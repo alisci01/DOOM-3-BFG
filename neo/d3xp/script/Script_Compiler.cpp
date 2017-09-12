@@ -173,6 +173,7 @@ opcode_t idCompiler::opcodes[] = {
 	{ "<PUSH>", "PUSH_F", -1, false, &def_float, &def_float, &def_void },
 	{ "<PUSH>", "PUSH_V", -1, false, &def_vector, &def_vector, &def_void },
 	{ "<PUSH>", "PUSH_S", -1, false, &def_string, &def_string, &def_void },
+	{ "<PUSH>", "PUSH_B", -1, false, &def_boolean, &def_boolean, &def_void },
 	{ "<PUSH>", "PUSH_ENT", -1, false, &def_entity, &def_entity, &def_void },
 	{ "<PUSH>", "PUSH_OBJ", -1, false, &def_object, &def_object, &def_void },
 	{ "<PUSH>", "PUSH_OBJENT", -1, false, &def_entity, &def_object, &def_void },

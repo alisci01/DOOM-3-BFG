@@ -1289,6 +1289,8 @@ idVarDef *idProgram::AllocDef( idTypeDef *type, const char *name, idVarDef *scop
 		// set the value to the variable's position in the object
 		def->value.ptrOffset = scope->TypeDef()->Size();
 	} else if ( scope->Type() == ev_function ) {
+			common->Printf( "blaslfal\n" );
+
 		//
 		// stack variable
 		//

@@ -1775,6 +1775,11 @@ bool idInterpreter::Execute() {
 			Push( *var_a.intPtr );
 			break;
 
+		case OP_PUSH_B:
+			var_a = GetVariable( st->a );
+			Push( *var_a.intPtr );
+			break;
+
 		case OP_PUSH_FTOS:
 			var_a = GetVariable( st->a );
 			PushString( FloatToString( *var_a.floatPtr ) );
