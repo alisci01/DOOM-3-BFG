@@ -1238,6 +1238,17 @@ idVarDef *idCompiler::LookupDef( const char *name, const idVarDef *baseobj ) {
 
 					// field access gets type from field
 					def->SetTypeDef( field->TypeDef()->FieldType() );
+
+					// when involving indirect addressing ops, we need to compensate the size the ptrs
+					//	would take up on the stack since the ptr size might be bigger than the primitive
+					//	data type the ptr points to
+					auto opcode = op - opcodes;
+					if ( opcode >= OP_INDIRECT_F && opcode <= OP_ADDRESS && def->initialized == idVarDef::stackVariable ) {
+						assert( def->scope->Type() == ev_function );
+						int ptrSizeDiff = sizeof( void * ) - def->TypeDef()->Size();
+						if ( ptrSizeDiff > 0 )
+							def->scope->value.functionPtr->locals += ptrSizeDiff;
+					}
 				}
 			}
 		}
@@ -1523,16 +1534,6 @@ idVarDef *idCompiler::GetExpression( int priority ) {
 				if ( ( statement.op >= OP_INDIRECT_F ) && ( statement.op < OP_ADDRESS ) ) {
 					statement.op = OP_ADDRESS;
 					type_pointer.SetPointerType( e->TypeDef() );
-
-					//TODO cleanup ptr size compensation (does this belong here?)
-					assert( statement.c->initialized == idVarDef::stackVariable );
-					if ( statement.c->initialized == idVarDef::stackVariable && ( e->Type() == ev_float || e->Type() == ev_boolean ) ) {
-						assert( statement.c->scope->Type() == ev_function );
-						int ptrSizeDiff = sizeof( void * ) - e->TypeDef()->Size();
-						assert( ptrSizeDiff >= 0 );
-						statement.c->scope->value.functionPtr->locals += ptrSizeDiff;
-					}
-
 					e->SetTypeDef( &type_pointer );
 				}
 			}
